@@ -48,8 +48,25 @@ score2<- data.mouse.a$ScorePerBite[data.mouse.a$ScorePerBite >= 1 & data.mouse.a
 score3<- data.mouse.a$ScorePerBite[data.mouse.a$ScorePerBite >= 2 & data.mouse.a$ScorePerBite<3]
 score4<- data.mouse.a$ScorePerBite[data.mouse.a$ScorePerBite >= 3 & data.mouse.a$ScorePerBite<4]
 score5<- data.mouse.a$ScorePerBite[data.mouse.a$ScorePerBite >= 4]
-logScore<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),mean(score5))
+logScoreTC<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),mean(score5))
 
+a1<-numeric(10000)
+a2<-numeric(10000)
+a3<-numeric(10000)
+a4<-numeric(10000)
+a5<-numeric(10000)
+for (i in 1:10000) a1[i] <-sample(score1,replace=TRUE)
+ao1<-quantile(a1,c(0.025,0.975))
+for (i in 1:10000) a2[i] <-sample(score2,replace=TRUE)
+ao2<-quantile(a2,c(0.025,0.975))
+for (i in 1:10000) a3[i] <-sample(score3,replace=TRUE)
+ao3<-quantile(a3,c(0.025,0.975))
+for (i in 1:10000) a4[i] <-sample(score4,replace=TRUE)
+ao4<-quantile(a4,c(0.025,0.975))
+for (i in 1:10000) a5[i] <-sample(score5,replace=TRUE)
+ao5<-quantile(a5,c(0.025,0.975))
+logScoreTCL<-c(0,ao1[1],ao2[1],ao3[1],ao4[1],ao5[1])
+logScoreTCU<-c(0,ao1[2],ao2[2],ao3[2],ao4[2],ao5[2])
 
 length(score1);length(score2);length(score3);length(score4);length(score5)
 var(score1);var(score2);var(score3);var(score4);var(score5)
@@ -62,14 +79,14 @@ parasit2<-sum(data.mouse.a$meanPara[data.mouse.a$ScoreType==1])/length(data.mous
 parasit3<-sum(data.mouse.a$meanPara[data.mouse.a$ScoreType==2])/length(data.mouse.a$meanPara[data.mouse.a$ScoreType==2])
 parasit4<-sum(data.mouse.a$meanPara[data.mouse.a$ScoreType==3])/length(data.mouse.a$meanPara[data.mouse.a$ScoreType==3])
 parasit5<-sum(data.mouse.a$meanPara[data.mouse.a$ScoreType==4])/length(data.mouse.a$meanPara[data.mouse.a$ScoreType==4])
-parasitMouseData<-c(0,parasit1,parasit2,parasit3,parasit4,parasit5)
+parasitMouseDataTC<-c(0,parasit1,parasit2,parasit3,parasit4,parasit5)
 
 prev1<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==0])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==0])
 prev2<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==1])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==1])
 prev3<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==2])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==2])
 prev4<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==3])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==3])
 prev5<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==4])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==4])
-prevMouseData<-c(0,prev1,prev2,prev3,prev4,prev5)
+prevMouseDataTC<-c(0,prev1,prev2,prev3,prev4,prev5)
 #
 ## Logistic fit
 #
@@ -78,30 +95,20 @@ log.binom<-function(p.vec){
   
   a<-p.vec[1]
   b<-p.vec[2]
+
+    pred1<- ((exp(a + b * logScore[1:6])) / (1 + exp(a + b * logScore[1:6])) )  
+    pred2<- ((exp(a + b * logScoreTC[1:6])) / (1 + exp(a + b * logScoreTC[1:6])) )  
+  #pred3<- ((exp(a + b * data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0])) / (1 + exp(a + b * data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0])) )  
   
-  pred0<- ((exp(a + b * 0) / (1 + exp(a + b * 0)) ) )
-  pred1<- ((exp(a + b * logScore[2])) / (1 + exp(a + b * logScore[2])) )  
-  pred2<- ((exp(a + b * logScore[3])) / (1 + exp(a + b * logScore[3])) )  
-  pred3<- ((exp(a + b * logScore[4])) / (1 + exp(a + b * logScore[4])) )  
-  pred4<- ((exp(a + b * logScore[5])) / (1 + exp(a + b * logScore[5])) )  
-  pred5<- ((exp(a + b * logScore[6])) / (1 + exp(a + b * logScore[6])) )  
+    prev1<-prevMouseData[1:6]
+    prev2<-prevMouseDataTC[1:6]
+  #prev3<-data.mouse.a$meanPar[data.mouse.a$rm.prev > 0]
   
+      loglik1<- prev1* log((pred1)+0.00001)+(1-prev1)*log(1-((pred1)-0.00001))
+      loglik2<- prev2* log((pred2)+0.00001)+(1-prev2)*log(1-((pred2)-0.00001))
+  #loglik3<- prev3* log((pred3)+0.00001)+(1-prev3)*log(1-((pred3)-0.00001))
   
-  prev0=sum(0)/length(0)
-  prev1<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==0])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==0])
-  prev2<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==1])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==1])
-  prev3<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==2])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==2])
-  prev4<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==3])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==3])
-  prev5<-sum(data.mouse.a$rm.prev[data.mouse.a$ScoreType==4])/length(data.mouse.a$rm.prev[data.mouse.a$ScoreType==4])
-  
-  loglik0<- prev0* log((pred0)+0.00001)+(1-prev0)*log(1-((pred0)-0.00001))
-  loglik1<- prev1* log((pred1)+0.00001)+(1-prev1)*log(1-((pred1)-0.00001))
-  loglik2<- prev2* log((pred2)+0.00001)+(1-prev2)*log(1-((pred2)-0.00001))
-  loglik3<- prev3* log((pred3)+0.00001)+(1-prev3)*log(1-((pred3)-0.00001))
-  loglik4<- prev4* log((pred4)+0.00001)+(1-prev4)*log(1-((pred4)-0.00001))
-  loglik5<- prev5* log((pred5)+0.00001)+(1-prev5)*log(1-((pred5)-0.00001))
-  
-  -sum(loglik0,loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T)
+  -sum(loglik1,loglik2,na.rm=T)
 }
 n.param<-2
 logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,0),upper=c(0,10))
@@ -110,9 +117,66 @@ logmod
 nc<-seq(0,4,0.01)
 pred<-(exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc))
 plot(logScore,prevMouseData,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
+points(logScoreTC,prevMouseDataTC)
+#points(data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0],data.mouse.a$meanPar[data.mouse.a$rm.prev > 0],pch=20)
+
 lines(nc,pred,lwd=2)
 
 
+
+log.binomL<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1L<- ((exp(a + b * logScoreL[1:6])) / (1 + exp(a + b * logScoreL[1:6])) )  
+  pred2L<- ((exp(a + b * logScoreTCL[1:6])) / (1 + exp(a + b * logScoreTCL[1:6])) )  
+  #pred3L<- ((exp(a + b * data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0])) / (1 + exp(a + b * data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0])) )  
+  
+  prev1L<-prevMouseData[1:6]
+  prev2L<-prevMouseDataTC[1:6]
+  #prev3L<-data.mouse.a$meanPar[data.mouse.a$rm.prev > 0]
+  
+  loglik1L<- prev1L* log((pred1L)+0.00001)+(1-prev1L)*log(1-((pred1L)-0.00001))
+  loglik2L<- prev2L* log((pred2L)+0.00001)+(1-prev2L)*log(1-((pred2L)-0.00001))
+  #loglik3L<- prev3L* log((pred3L)+0.00001)+(1-prev3L)*log(1-((pred3L)-0.00001))
+  
+  -sum(loglik1L,loglik2L,na.rm=T)
+}
+n.param<-2
+logmodL<-optim(c(0,0),log.binomL,method="L-BFGS-B",lower=c(-10,0),upper=c(0,10))
+logmodL
+
+nc<-seq(0,4,0.01)
+predL<-(exp(logmodL$par[1] + logmodL$par[2] * nc)) / (1 + exp(logmodL$par[1] + logmodL$par[2] * nc))
+lines(nc,predL,lwd=2,lty=2)
+
+log.binomU<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1U<- ((exp(a + b * logScoreU[1:6])) / (1 + exp(a + b * logScoreU[1:6])) )  
+  pred2U<- ((exp(a + b * logScoreTCU[1:6])) / (1 + exp(a + b * logScoreTCU[1:6])) )  
+  #pred3U<- ((exp(a + b * data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0])) / (1 + exp(a + b * data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0])) )  
+  
+  prev1U<-prevMouseData[1:6]
+  prev2U<-prevMouseDataTC[1:6]
+  #prev3U<-data.mouse.a$meanPar[data.mouse.a$rm.prev > 0]
+  
+  loglik1U<- prev1U* log((pred1U)+0.00001)+(1-prev1U)*log(1-((pred1U)-0.00001))
+  loglik2U<- prev2U* log((pred2U)+0.00001)+(1-prev2U)*log(1-((pred2U)-0.00001))
+  #loglik3U<- prev3U* log((pred3U)+0.00001)+(1-prev3U)*log(1-((pred3U)-0.00001))
+  
+  -sum(loglik1U,loglik2U,na.rm=T)
+}
+n.param<-2
+logmodU<-optim(c(0,0),log.binomU,method="L-BFGS-B",lower=c(-10,0),upper=c(0,10))
+logmodU
+
+nc<-seq(0,4,0.01)
+predU<-(exp(logmodU$par[1] + logmodU$par[2] * nc)) / (1 + exp(logmodU$par[1] + logmodU$par[2] * nc))
+lines(nc,predU,lwd=2,lty=2)
 #
 ## Saturating fit
 #

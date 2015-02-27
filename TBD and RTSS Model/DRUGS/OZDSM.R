@@ -24,6 +24,21 @@ score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4  & sp
 
 logScoreD<-c(mean(score0),mean(score1),mean(score2),mean(score3),max(spors$ScorePerBite[spors$Treatment == "OZDSM"]),max(spors$ScorePerBite[spors$Treatment == "OZDSM"]))
 
+a1<-numeric(10000)
+a2<-numeric(10000)
+a3<-numeric(10000)
+a4<-numeric(10000)
+for (i in 1:10000) a1[i] <-sample(score1,replace=TRUE)
+ao1<-quantile(a1,c(0.025,0.975))
+for (i in 1:10000) a2[i] <-sample(score2,replace=TRUE)
+ao2<-quantile(a2,c(0.025,0.975))
+for (i in 1:10000) a3[i] <-sample(score3,replace=TRUE)
+ao3<-quantile(a3,c(0.025,0.975))
+for (i in 1:10000) a4[i] <-sample(score4,replace=TRUE)
+ao4<-quantile(a4,c(0.025,0.975))
+logScoreLDSM<-c(0,ao1[1],ao2[1],ao3[1],max(score3),max(score3))
+logScoreUDSM<-c(0,ao1[2],ao2[2],ao3[2],min(score3),min(score3))
+
 
 oocysts<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\UCT OZPIP FER DSM Feb2015\\M2M SporozoiteScores\\OocystIntensity.txt",header=TRUE)
 OZDSM<-subset(oocysts,Treatment=="OZDSM")
@@ -53,53 +68,80 @@ sat.binom<-function(p.vec){
   gamma <- p.vec[4]
   
   
-  pred1<- (alpha * oocD1[1]^beta)/(delta + gamma * oocD1[1]^beta)
-  pred2<- (alpha * oocD1[2]^beta)/(delta + gamma * oocD1[2]^beta)
-  pred3<- (alpha * oocD1[3]^beta)/(delta + gamma * oocD1[3]^beta)  
-  pred4<- (alpha * oocD1[4]^beta)/(delta + gamma * oocD1[4]^beta)  
-  pred5<- (alpha * oocD1[5]^beta)/(delta + gamma * oocD1[5]^beta)  
+  pred1<- (alpha * oocD1[1:6]^beta)/(delta + gamma * oocD1[1:6]^beta)
+ 
   
   #a <- p.vec[1]
   #b <- p.vec[2]
   
-  #pred1<- ((exp(a + b * oocD1[2])) / (1 + exp(a + b * oocD1[2])) )  
-  #pred2<- ((exp(a + b * oocD1[3])) / (1 + exp(a + b * oocD1[3])) )  
-  #pred3<- ((exp(a + b * oocD1[4])) / (1 + exp(a + b * oocD1[4])) )  
-  #pred4<- ((exp(a + b * oocD1[5])) / (1 + exp(a + b * oocD1[5])) )  
-  #pred5<- ((exp(a + b * oocD1[6])) / (1 + exp(a + b * oocD1[6])) ) 
+  #pred1<- ((exp(a + b * oocD1[1:6])) / (1 + exp(a + b * oocD1[1:6])) )  
 
-  spors1<-logScoreD[1]
-  spors2<-logScoreD[2]
-  spors3<-logScoreD[3]
-  spors4<-logScoreD[4]
-  spors5<-logScoreD[5]
+
+  spors1<-logScoreD[1:6]
 
   
   loglik1<- spors1* log((pred1)+0.001)+(1-spors1)*log(1-((pred1)-0.001))
-  loglik2<- spors2* log((pred2)+0.001)+(1-spors2)*log(1-((pred2)-0.001))
-  loglik3<- spors3* log((pred3)+0.001)+(1-spors3)*log(1-((pred3)-0.001))
-  loglik4<- spors4* log((pred4)+0.001)+(1-spors4)*log(1-((pred4)-0.001))
-  loglik5<- spors5* log((pred5)+0.001)+(1-spors5)*log(1-((pred5)-0.001))
+ 
   
-  -sum(loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T)
+  -sum(loglik1,na.rm=T)
 }
-#n.param<-4
-#satmod2<-optim(c(3.5,0.999,49,0.75),sat.binom,method="L-BFGS-B",lower=c(0,0.6,1,0.68),upper=c(6,0.999999,100,0.99))
-#satmod2
-
 n.param<-4
-satmod2<-optim(c(4,0.999,10,0.99),sat.binom,method="L-BFGS-B",lower=c(-10,0.6,1,0.8),upper=c(100,0.9999,100,0.9999))
+satmod2<-optim(c(2.2,0.999,25,0.8),sat.binom,method="L-BFGS-B",lower=c(0,0.6,8,0.8),upper=c(2.2,0.999999,100,0.99))
 satmod2
 
-par(mfrow=c(1,1))
+#n.param<-4
+#satmod2<-optim(c(4,0.999,10,0.99),sat.binom,method="L-BFGS-B",lower=c(-10,0.6,1,0.8),upper=c(100,0.9999,100,0.9999))
+#satmod2
+
+par(mfrow=c(1,2))
 
 nc<-seq(0,max(oocdataD1),1)
-pred<-(satmod2$par[1] * nc^satmod2$par[2])/(satmod2$par[3] + satmod2$par[4] * nc^satmod2$par[2])
+predDSM<-(satmod2$par[1] * nc^satmod2$par[2])/(satmod2$par[3] + satmod2$par[4] * nc^satmod2$par[2])
 #pred2<-((exp(satmod3$par[1]  + satmod3$par[2]  * nc)) / (1 + exp(satmod3$par[1]  + satmod3$par[2]  * nc)) ) 
-plot(oocD1,logScoreD,ylim=c(0,5),bty="n",xlim=c(0,300),
+plot(oocD1,logScoreD,ylim=c(0,5),bty="n",xlim=c(0,300),main="DSM",
      las=1,xlab="Oocysts",ylab="Sporozoites",cex=1.25,col="chartreuse4",pch=16)
-lines(nc,pred,lwd=2,col="red")
+lines(nc,predDSM,lwd=2,col="red")
 
+
+sat.binomL<-function(p.vec){
+  
+  alpha  <- p.vec[1]
+  beta  <- p.vec[2]
+  delta <- p.vec[3]
+  gamma <- p.vec[4]
+  
+   pred1<- (alpha * oocD1[1:6]^beta)/(delta + gamma * oocD1[1:6]^beta)
+   spors1<-logScoreLDSM[1:6]
+  
+   loglik1<- spors1* log((pred1)+0.001)+(1-spors1)*log(1-((pred1)-0.001))
+  
+    -sum(loglik1,na.rm=T)
+}
+n.param<-4
+satmod2L<-optim(c(2.2,0.999,25,0.8),sat.binomL,method="L-BFGS-B",lower=c(0,0.5,5,0.8),upper=c(2.2,0.999999,100,0.99))
+satmod2L
+predDSML<-(satmod2L$par[1] * nc^satmod2L$par[2])/(satmod2L$par[3] + satmod2L$par[4] * nc^satmod2L$par[2])
+lines(nc,predDSML,lwd=2,col="red",lty=2)
+
+sat.binomU<-function(p.vec){
+  
+  alpha  <- p.vec[1]
+  beta  <- p.vec[2]
+  delta <- p.vec[3]
+  gamma <- p.vec[4]
+  
+  pred1<- (alpha * oocD1[1:6]^beta)/(delta + gamma * oocD1[1:6]^beta)
+  spors1<-logScoreUDSM[1:6]
+  
+  loglik1<- spors1* log((pred1)+0.001)+(1-spors1)*log(1-((pred1)-0.001))
+  
+  -sum(loglik1,na.rm=T)
+}
+n.param<-4
+satmod2U<-optim(c(2.2,0.999,5,0.8),sat.binomU,method="L-BFGS-B",lower=c(0,0.5,5,0.8),upper=c(2.2,0.999999,100,0.99))
+satmod2U
+predDSMU<-(satmod2U$par[1] * nc^satmod2U$par[2])/(satmod2U$par[3] + satmod2U$par[4] * nc^satmod2U$par[2])
+lines(nc,predDSMU,lwd=2,col="red",lty=2)
 ########################################
 ##
 ###
@@ -114,7 +156,7 @@ prev2<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "1"])/l
 prev3<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "2"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "2"])
 prev4<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "3"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "3"])
 prev5<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "4"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "4"])
-prevMouseData<-c(0,prev1,prev2,prev3,NA,1)
+prevMouseDataDSM<-c(0,prev1,prev2,prev3,NA,1)
 
 
 #
@@ -139,38 +181,66 @@ sat.binom<-function(p.vec){
   a <- p.vec[1]
   b <- p.vec[2]
   #pred0<- ((exp(a + b * 0) / (1 + exp(a + b * 0)) ) )
-  pred1<- ((exp(a + b * logScoreD[1])) / (1 + exp(a + b * logScoreD[1])) )  
-  pred2<- ((exp(a + b * logScoreD[2])) / (1 + exp(a + b * logScoreD[2])) )  
-  pred3<- ((exp(a + b * logScoreD[3])) / (1 + exp(a + b * logScoreD[3])) )  
-  pred4<- ((exp(a + b * logScoreD[4])) / (1 + exp(a + b * logScoreD[4])) )  
-  pred5<- ((exp(a + b * logScoreD[6])) / (1 + exp(a + b * logScoreD[6])) ) 
+  pred1<- ((exp(a + b * logScoreD[1:6])) / (1 + exp(a + b * logScoreD[1:6])) )  
   
-  prev1<-prevMouseData[1]
-  prev2<-prevMouseData[2]
-  prev3<-prevMouseData[3]
-  prev4<-prevMouseData[4]
-  prev5<-prevMouseData[6]
-  
-  #loglik0<- prev0* log((pred0)+0.001)+(1-prev0)*log(1-((pred0)-0.001))
+  prev1<-prevMouseDataDSM[1:6]
+
   loglik1<- prev1* log((pred1)+0.001)+(1-prev1)*log(1-((pred1)-0.001))
-  loglik2<- prev2* log((pred2)+0.001)+(1-prev2)*log(1-((pred2)-0.001))
-  loglik3<- prev3* log((pred3)+0.001)+(1-prev3)*log(1-((pred3)-0.001))
-  loglik4<- prev4* log((pred4)+0.001)+(1-prev4)*log(1-((pred4)-0.001))
-  loglik5<- prev5* log((pred5)+0.001)+(1-prev5)*log(1-((pred5)-0.001))
   
-  -sum(loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T)
+  -sum(loglik1,na.rm=T)
 }
 n.param<-2
-satmod<-optim(c(0,0),sat.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+satmod<-optim(c(0,0),sat.binom,method="L-BFGS-B",lower=c(-100,-10),upper=c(10,10))
 satmod
 
 nc<-seq(0,4,0.01)
-pred1<- ((exp(satmod$par[1] + satmod$par[2] * nc)) / (1 + exp(satmod$par[1] + satmod$par[2] * nc)) ) 
+pred1DSM<- ((exp(satmod$par[1] + satmod$par[2] * nc)) / (1 + exp(satmod$par[1] + satmod$par[2] * nc)) ) 
 #pred<-(0 + satmod$par[1] * nc^1)/(satmod$par[3] + satmod$par[2] * nc^1) 
 plot(logScoreD,prevMouseData,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
-lines(nc,pred1,lwd=2,lty=2,col="red")
+lines(nc,pred1DSM,lwd=2,col="red")
+
+sat.binomL2<-function(p.vec){
+
+  a <- p.vec[1]
+  b <- p.vec[2]
+
+  pred1L<- ((exp(a + b * logScoreLDSM[1:6])) / (1 + exp(a + b * logScoreLDSM[1:6])) )  
+  
+  prev1L<-prevMouseDataDSM[1:6]
+  
+  loglik1<- prev1L* log((pred1L)+0.001)+(1-prev1L)*log(1-((pred1L)-0.001))
+  
+  -sum(loglik1,na.rm=T)
+}
+n.param<-2
+satmod<-optim(c(0,0),sat.binomL2,method="L-BFGS-B",lower=c(-100,-10),upper=c(10,100))
+satmod
+
+nc<-seq(0,4,0.01)
+pred1DSML<- ((exp(satmod$par[1] + satmod$par[2] * nc)) / (1 + exp(satmod$par[1] + satmod$par[2] * nc)) ) 
+lines(nc,pred1DSML,lwd=2,lty=2,col="red")
 
 
+sat.binomU2<-function(p.vec){
+  
+  a <- p.vec[1]
+  b <- p.vec[2]
+  
+  pred1U<- ((exp(a + b * logScoreUDSM[1:6])) / (1 + exp(a + b * logScoreUDSM[1:6])) )  
+  
+  prev1U<-prevMouseDataDSM[1:6]
+  
+  loglik1<- prev1U* log((pred1U)+0.001)+(1-prev1U)*log(1-((pred1U)-0.001))
+  
+  -sum(loglik1,na.rm=T)
+}
+n.param<-2
+satmodU<-optim(c(0,0),sat.binomU2,method="L-BFGS-B",lower=c(-100,-10),upper=c(10,100))
+satmodU
+
+nc<-seq(0,4,0.01)
+pred1DSMU<- ((exp(satmodU$par[1] + satmodU$par[2] * nc)) / (1 + exp(satmodU$par[1] + satmodU$par[2] * nc)) ) 
+lines(nc,pred1DSMU,lwd=2,lty=2,col="red")
 #######################################
 ##
 ###
@@ -186,49 +256,54 @@ oocdataD1<-sort(OZDSMs$oocysts[OZDSMs$oocysts > 0])
 length(oocdataD1)/5
 ooc
 
-ooc.binom<-function(p.vec){
-  
-  alpha <- p.vec[1]
-  beta  <- p.vec[2]
-  delta <- p.vec[3]
-  gamma <- p.vec[4]
-  a <- p.vec[5]
-  b <- p.vec[6]
-  
-  
-  fitooc1 <- ((exp(a + b * ((alpha * ooc[1]^beta)/(delta + gamma * ooc[1]^beta)))) / (1 + exp(a + b * ((alpha * ooc[1]^beta)/(delta + gamma * ooc[1]^beta)))) )
-  fitooc2 <- ((exp(a + b * ((alpha * ooc[2]^beta)/(delta + gamma * ooc[2]^beta)))) / (1 + exp(a + b * ((alpha * ooc[2]^beta)/(delta + gamma * ooc[2]^beta)))) )
-  fitooc3 <- ((exp(a + b * ((alpha * ooc[3]^beta)/(delta + gamma * ooc[3]^beta)))) / (1 + exp(a + b * ((alpha * ooc[3]^beta)/(delta + gamma * ooc[3]^beta)))) )
-  fitooc4 <- ((exp(a + b * ((alpha * ooc[4]^beta)/(delta + gamma * ooc[4]^beta)))) / (1 + exp(a + b * ((alpha * ooc[4]^beta)/(delta + gamma * ooc[4]^beta)))) )
-  fitooc5 <- ((exp(a + b * ((alpha * ooc[6]^beta)/(delta + gamma * ooc[6]^beta)))) / (1 + exp(a + b * ((alpha * ooc[6]^beta)/(delta + gamma * ooc[6]^beta)))) )
-  
-  prev1<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "0"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "0"])
-  prev2<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "1"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "1"])
-  prev3<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "2"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "2"])
-  prev4<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "3"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "3"])
-  prev5<-sum(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "4"])/length(spors$bsprev[spors$Treatment=="OZDSM" & spors$ScorePerBite == "4"])
-  
-  
-  
-  loglik2<- fitooc1* log((prev1)+0.001)+(1-fitooc1)*log(1-((prev1)-0.001))
-  loglik3<- fitooc1* log((prev2)+0.001)+(1-fitooc1)*log(1-((prev2)-0.001))
-  loglik4<- fitooc1* log((prev3)+0.001)+(1-fitooc1)*log(1-((prev3)-0.001))
-  loglik5<- fitooc1* log((prev4)+0.001)+(1-fitooc1)*log(1-((prev4)-0.001))
-  loglik6<- fitooc1* log((prev5)+0.001)+(1-fitooc1)*log(1-((prev5)-0.001))
-  
-  
-  -sum(loglik2,loglik3,loglik4,loglik5,loglik6,na.rm=T)
-}
-n.param<-6
-oocmod<-optim(c(2.5140557, 0.7033866,10.0908338,0.9997296,-10,8.2261),ooc.binom,method="L-BFGS-B",
-              lower=c(1,0.5,5,0.5,-13,-10),
-              upper=c(10,0.9999,50,0.999,-6,10))
-oocmod
+###Mean model
 
-fitdatD2<-seq(0,max(oocdataD1),1)
-predD2<-((exp(oocmod$par[5] + oocmod$par[6] * ((oocmod$par[1] * fitdatD2^oocmod$par[2])/(oocmod$par[3] + oocmod$par[4] * fitdatD2^oocmod$par[2])))) / 
-           (1 + exp(oocmod$par[5] + oocmod$par[6] * ((oocmod$par[1] * fitdatD2^oocmod$par[2])/(oocmod$par[3] + oocmod$par[4] * fitdatD2^oocmod$par[2])))) )
+fitdat<-seq(0,max(oocdata1),1)
+alpha = 2.2
+beta = 0.99999999
+delta = 8
+gamma = 0.8
+a <- -12.24466
+b <- 10
 
 
-plot(ooc,prevMouseData,ylim=c(0,1),bty="n",xlim=c(0,200),las=1,xlab="Oocyst intensity",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
-lines(fitdatD2,predD2,lwd=2,col="red",lty=2)
+fitooc1DSM <- ((exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) / 
+              (1 + exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) )
+
+points(fitooc1DSM~fitdat,xlim=c(0,120),
+       pch=20,col="red")
+lines(fitdat,fitooc1DSM,lwd=2)
+
+
+
+###Upper model
+
+alpha = 2.2
+beta = 0.9999
+delta = 5
+gamma = 0.8
+
+a <- -33.93591
+b <- 34.34221
+fitooc1UDSM <- ((exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) / 
+               (1 + exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) )
+
+lines(fitdat,fitooc1UDSM,lwd=2,lty=2,col="red")
+
+
+
+###Lower model
+
+alpha = 2.1758484
+beta = 0.9810398
+delta = 12.1133842
+gamma = 0.8145564
+
+a <- -100
+b <- 62.75
+
+
+fitooc1LDSM <- ((exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) / 
+               (1 + exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) )
+
+lines(fitdat,fitooc1LDSM,lwd=2,lty=2,col="red")

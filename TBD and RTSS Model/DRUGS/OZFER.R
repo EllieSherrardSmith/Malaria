@@ -22,7 +22,21 @@ score2<- spors$ScorePerBite[spors$ScorePerBite >= 1 & spors$ScorePerBite<2  & sp
 score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3  & spors$Treatment == "OZFER"]
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4  & spors$Treatment == "OZFER"]
 
-logScoreD<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),max(score4))
+logScoreDFER<-c(mean(score0),mean(score1),mean(score2),mean(score3),max(score4))
+a1<-numeric(10000)
+a2<-numeric(10000)
+a3<-numeric(10000)
+a4<-numeric(10000)
+for (i in 1:10000) a1[i] <-sample(score1,replace=TRUE)
+ao1<-quantile(a1,c(0.025,0.975))
+for (i in 1:10000) a2[i] <-sample(score2,replace=TRUE)
+ao2<-quantile(a2,c(0.025,0.975))
+for (i in 1:10000) a3[i] <-sample(score3,replace=TRUE)
+ao3<-quantile(a3,c(0.025,0.975))
+for (i in 1:10000) a4[i] <-sample(score4,replace=TRUE)
+ao4<-quantile(a4,c(0.025,0.975))
+logScoreLFER<-c(0,ao1[1],ao2[1],ao3[1],ao4[1])
+logScoreUFER<-c(0,ao1[2],ao2[2],ao3[2],ao4[2])
 
 
 oocysts<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\UCT OZPIP FER DSM Feb2015\\M2M SporozoiteScores\\OocystIntensity.txt",header=TRUE)
@@ -30,7 +44,7 @@ OZFER<-subset(oocysts,Treatment=="OZFER")
 
 oocdataD1<-sort(OZFER$oocysts[OZFER$oocysts > 0])
 length(oocdataD1)/5
-oocD1<-c(0,mean(oocdataD1[1:12]),mean(oocdataD1[13:24]),mean(oocdataD1[25:36]),mean(oocdataD1[37:48]),mean(oocdataD1[49:60]))
+oocD1<-c(0,mean(oocdataD1[1:12]),mean(oocdataD1[13:24]),mean(oocdataD1[25:36]),mean(oocdataD1[49:60]))
 
 
 #######################################
@@ -44,54 +58,50 @@ oocD1<-c(0,mean(oocdataD1[1:12]),mean(oocdataD1[13:24]),mean(oocdataD1[25:36]),m
 
 #
 ## 
-Logistic fit
+###Logistic fit
 #
-sat.binom<-function(p.vec){
+sat.binomFER<-function(p.vec){
  
-###alpha  <- p.vec[1]
-###beta  <- p.vec[2]
-###delta <- p.vec[3]
-###gamma <- p.vec[4]
+alpha  <- p.vec[1]
+beta  <- p.vec[2]
+delta <- p.vec[3]
+gamma <- p.vec[4]
   
   
- ###pred1<- (alpha * oocD1[1:6]^beta)/(delta + gamma * oocD1[1:6]^beta)
+pred1<- (alpha * oocD1[1:5]^beta)/(delta + gamma * oocD1[1:5]^beta)
  
   
-  a <- p.vec[1]
-  b <- p.vec[2]
+###  a <- p.vec[1]
+###  b <- p.vec[2]
   
-  pred1<- 3.5 * ((exp(a + b * oocD1[1:6])) / (1 + exp(a + b * oocD1[1:6])) )
+###  pred1<- 3.5 * ((exp(a + b * oocD1[1:6])) / (1 + exp(a + b * oocD1[1:6])) )
   
-  spors1<-logScoreD[1:6]
+  spors1<-logScoreDFER[1:5]
   
-  loglik1<- spors1* log((pred1)+0.001)+(1-spors1)*log(1-((pred1)-0.001))
+  loglik1<- spors1* log((pred1)+0.00001)+(1-spors1)*log(1-((pred1)-0.00001))
   
   -sum(loglik1,na.rm=T)
 }
-###n.param<-4
-###satmod2<-optim(c(3.5,0.8,15,0.95),sat.binom,method="L-BFGS-B",
-###              lower=c(0,0.6,10,0.1),
-###              upper=c(10,0.999999,100,0.99))
-###satmod2
+n.param<-4
+satmod2FER<-optim(c(3.5,0.8,15,0.95),sat.binomFER,method="L-BFGS-B",
+            lower=c(0,0.6,10,0.1),
+             upper=c(10,0.999999,100,0.99))
+satmod2FER
 
-n.param<-2
-satmod2<-optim(c(-2,0.15),sat.binom,method="L-BFGS-B",lower=c(-10,0),upper=c(10,0.15))
-satmod2
+###n.param<-2
+###satmod2<-optim(c(-2,0.15),sat.binom,method="L-BFGS-B",lower=c(-10,0),upper=c(10,0.15))
+###satmod2
 
 par(mfrow=c(1,1))
 
 nc<-seq(0,max(oocdata1),1)
-###pred<-(satmod2$par[1] * nc^satmod2$par[2])/(satmod2$par[3] + satmod2$par[4] * nc^satmod2$par[2])
-pred2<-3.5*((exp(satmod2$par[1]  + satmod2$par[2]  * nc)) / (1 + exp(satmod2$par[1]  + satmod2$par[2]  * nc)) ) 
-plot(oocD1,logScoreD,ylim=c(0,5),bty="n",xlim=c(0,300),
+predFER<-(satmod2FER$par[1] * nc^satmod2FER$par[2])/(satmod2FER$par[3] + satmod2FER$par[4] * nc^satmod2FER$par[2])
+###pred2<-3.5*((exp(satmod2$par[1]  + satmod2$par[2]  * nc)) / (1 + exp(satmod2$par[1]  + satmod2$par[2]  * nc)) ) 
+plot(oocD1,logScoreDFER,ylim=c(0,5),bty="n",xlim=c(0,300),
      las=1,xlab="Oocysts",ylab="Sporozoites",cex=1.25,col="chartreuse4",pch=16)
-lines(nc,pred2,lwd=2,col="red")
+lines(nc,predFER,lwd=2,col="red")
 
 
-a = -2
-  b = 0.15
-pred1<- 3.5*((exp(a + b * nc)) / (1 + exp(a + b * nc)) )
-lines(nc,pred1,lwd=2,col="red")
 
 ########################################
 ##
@@ -107,7 +117,7 @@ prev2<-sum(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "1"])/l
 prev3<-sum(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "2"])/length(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "2"])
 prev4<-sum(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "3"])/length(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "3"])
 prev5<-sum(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "4"])/length(spors$bsprev[spors$Treatment=="OZFER" & spors$ScorePerBite == "4"])
-prevMouseData<-c(0,prev1,prev2,prev3,NA,1)
+prevMouseDataFER<-c(0,prev1,prev2,prev3,1)
 
 
 #
@@ -128,8 +138,8 @@ sat.binom<-function(p.vec){
   a <- p.vec[1]
   b <- p.vec[2]
 
-  pred1<- ((exp(a + b * logScoreD[1:6])) / (1 + exp(a + b * logScoreD[1:6])) )    
-  prev1<-prevMouseData[1:6]
+  pred1<- ((exp(a + b * logScoreDFER[1:5])) / (1 + exp(a + b * logScoreDFER[1:5])) )    
+  prev1<-prevMouseDataFER[1:5]
 
   loglik1<- prev1* log((pred1)+0.001)+(1-prev1)*log(1-((pred1)-0.001))
   
@@ -140,10 +150,10 @@ satmod<-optim(c(0,0),sat.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10)
 satmod
 
 nc<-seq(0,4,0.01)
-pred1<- ((exp(satmod$par[1] + satmod$par[2] * nc)) / (1 + exp(satmod$par[1] + satmod$par[2] * nc)) ) 
+pred1FER<- ((exp(satmod$par[1] + satmod$par[2] * nc)) / (1 + exp(satmod$par[1] + satmod$par[2] * nc)) ) 
 #pred<-(0 + satmod$par[1] * nc^1)/(satmod$par[3] + satmod$par[2] * nc^1) 
-plot(logScoreD,prevMouseData,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
-lines(nc,pred1,lwd=2,lty=2,col="red")
+plot(logScoreDFER,prevMouseDataFER,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
+lines(nc,pred1FER,lwd=2,lty=2,col="red")
 
 
 #######################################
@@ -154,52 +164,52 @@ lines(nc,pred1,lwd=2,lty=2,col="red")
 ##
 ########################################
 
-oocysts<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\UCT OZPIP FER DSM Feb2015\\M2M SporozoiteScores\\OocystIntensity.txt",header=TRUE)
-OZFERs<-subset(oocysts,Treatment=="OZFER")
 
-oocdata1<-sort(OZFERs$oocysts[OZFERs$oocysts > 0])
-length(oocdata1)/5
-oocd<-c(0,mean(oocdata1[1:19]),mean(oocdata1[20:38]),mean(oocdata1[38:57]),mean(oocdata1[58:77]),mean(oocdata1[78:96]))
+###Mean model
 
-ooc.binom<-function(p.vec){
-  
-  beta)
-  #a <- p.vec[1]
-  #b <- p.vec[2]
-  #ac<- p.vec[3]
-  #bc<- p.vec[4]
-  #fitooc1 <- ((exp(a + b * (3.5 * ((exp(ac + bc * oocD1[1:6])) / (1 + exp(ac + bc * oocD1[1:6])) )))) / 
-  #              (1 + exp(a + b * (3.5 * ((exp(ac + bc * oocD1[1:6])) / (1 + exp(ac + bc * oocD1[1:6])) )))) )
-  
-  
-  
-alpha  <- p.vec[1]
-beta  <- p.vec[2]
-delta <- p.vec[3]
-gamma <- p.vec[4]
-  
-  
-  fitooc2<- (alpha * oocD1[1:6]^beta)/(delta + gamma * oocD1[1:6]^beta)
+alpha = 3.5457676
+beta = 0.9562184
+delta = 14.9907515
+gamma = 0.92777794
+a <- -3.01062
+b <- 2.045771
 
-  prev1<-prevMouseData[1:6]
-  loglik2<- fitooc2* log((prev1)+0.001)+(1-fitooc2)*log(1-((prev1)-0.001))
- 
-  -sum(loglik2,na.rm=T)
-}
-n.param<-4
-#oocmod<-optim(c(-2.288,0.1444,-3.010623,2.045771),ooc.binom,method="L-BFGS-B",
-#              lower=c(-3,0.14,-4,2),
-#              upper=c(-2,0.15,-3,2.1))
-#oocmod
 
-oocmod<-optim(c(1,0.4,10,0.5),ooc.binom,method="L-BFGS-B",
-                lower=c(0,0.4,1,0.1),
-                upper=c(1,0.999,100,0.99))
-oocmod
-fitdatD1<-seq(0,max(oocdata1),1)
-#predD1<-((exp(oocmod$par[1] + oocmod$par[2] * (3.5 * ((exp(oocmod$par[3] + oocmod$par[4] * fitdatD1)) / (1 + exp(oocmod$par[3] + oocmod$par[4] * fitdatD1)) )))) / 
-#           (1 + exp(oocmod$par[1] + oocmod$par[2] * (3.5 * ((exp(oocmod$par[3] + oocmod$par[4] * fitdatD1)) / (1 + exp(oocmod$par[3] + oocmod$par[4] * fitdatD1)) )))) )
-predD2<-(oocmod$par[1] * fitdatD1^oocmod$par[2])/(oocmod$par[3] + oocmod$par[4] * fitdatD1^oocmod$par[2])
+fitooc1FER <- ((exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) / 
+              (1 + exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) )
 
-plot(ooc,prevMouseData,ylim=c(0,1),bty="n",xlim=c(0,200),las=1,xlab="Oocyst intensity",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
-lines(fitdatD1,predD2,lwd=2,col="red")
+points(fitooc1FER~fitdat,xlim=c(0,120),xlab="Number of oocysts",ylab="Prevalence of blood stage infection",col="red",pch=20)
+lines(fitdat,fitooc1FER,lwd=2,col="red")
+
+
+
+###Upper model
+
+alpha = 
+beta = 
+delta = 
+gamma = 
+a <- 
+b <- 
+
+fitooc1Ufer <- ((exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) / 
+               (1 + exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) )
+
+lines(fitdat,fitooc1Ufer,lwd=2,lty=2)
+
+
+
+###Lower model
+
+alpha = 
+beta = 
+delta = 
+gamma = 
+a <- 
+b <- 
+
+
+fitooc1Lfer <- ((exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) / 
+               (1 + exp(a + b * ((alpha * fitdat^beta)/(delta + gamma * fitdat^beta)))) )
+
+lines(fitdat,fitooc1Lfer,lwd=2,lty=2)
