@@ -108,7 +108,9 @@ log.binom<-function(p.vec){
       loglik2<- prev2* log((pred2)+0.00001)+(1-prev2)*log(1-((pred2)-0.00001))
   #loglik3<- prev3* log((pred3)+0.00001)+(1-prev3)*log(1-((pred3)-0.00001))
   
-  -sum(loglik1,loglik2,na.rm=T)
+  -sum(loglik1,loglik2,
+       #loglik3,
+       na.rm=T)
 }
 n.param<-2
 logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,0),upper=c(0,10))
