@@ -136,6 +136,9 @@ oocUCTL<-c(0,bo1[1],bo2[1],bo3[1],bo4[1],bo5[1])
 oocUCTU<-c(0,bo1[2],bo2[2],bo3[2],bo4[2],bo5[2])
 
 
+oocATV25<-read.table("")
+
+
 ##########################################################################
 ## 
 ##  ##       ##     #########        ##    ###       ##      ###
@@ -165,6 +168,7 @@ score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3 & spo
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4 & spors$Treatment == "Blank"]
 score5<- spors$ScorePerBite[spors$ScorePerBite >= 4 & spors$Treatment == "Blank"]
 
+score<-c(score0,score1,score2,score3,score4,score5)
 logScore<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),max(score4))
 a1<-numeric(10000)
 a2<-numeric(10000)
@@ -189,6 +193,7 @@ score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3 & spo
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4 & spors$Treatment == "OZFER"]
 score5<- spors$ScorePerBite[spors$ScorePerBite >= 4 & spors$Treatment == "OZFER"]
 
+FERscore<-c(score0,score1,score2,score3,score4,score5)
 logScoreFER<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),max(score4))
 a1<-numeric(10000)
 a2<-numeric(10000)
@@ -213,6 +218,7 @@ score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3 & spo
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4 & spors$Treatment == "OZDSM"]
 score5<- spors$ScorePerBite[spors$ScorePerBite >= 4 & spors$Treatment == "OZDSM"]
 
+DSMscore<-c(score0,score1,score2,score3,score4,score5)
 logScoreDSM<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),max(score4))
 a1<-numeric(10000)
 a2<-numeric(10000)
@@ -236,6 +242,7 @@ score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3 & spo
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4 & spors$Treatment == "OZPIP"]
 score5<- spors$ScorePerBite[spors$ScorePerBite >= 4 & spors$Treatment == "OZPIP"]
 
+PIPscore<-c(score0,score1,score2,score3,score4,score5)
 logScorePIP<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),max(score4))
 a1<-numeric(10000)
 a2<-numeric(10000)
@@ -260,6 +267,7 @@ score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3 & spo
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4 & spors$Treatment == "UCT"]
 score5<- spors$ScorePerBite[spors$ScorePerBite >= 4 & spors$Treatment == "UCT"]
 
+UCTscore<-c(score0,score1,score2,score3,score4,score5)
 logScoreUCT<-c(mean(score0),mean(score1),mean(score2),mean(score3),mean(score4),max(score4))
 a1<-numeric(10000)
 a2<-numeric(10000)
@@ -301,7 +309,9 @@ BLANKbsprev2<-sum(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 
 BLANKbsprev3<-sum(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "Blank"])/length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "Blank"])
 BLANKbsprev4<-sum(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "Blank"])/length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "Blank"])
 BLANKbsprev5<-sum(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "Blank"])/length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "Blank"])
-prevBLANK<-c(BLANKbsprev0,BLANKbsprev1,BLANKbsprev2,BLANKbsprev3,1,1)
+prevBLANK<-c(BLANKbsprev0,BLANKbsprev1,BLANKbsprev2,BLANKbsprev3,NA,NA)
+
+
 
 #& spors$Treatment == "UCT"
 
@@ -311,7 +321,7 @@ FERbsprev2<-sum(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 & 
 FERbsprev3<-sum(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZFER"])/length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZFER"])
 FERbsprev4<-sum(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZFER"])/length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZFER"])
 FERbsprev5<-sum(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZFER"])/length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZFER"])
-prevFER<-c(FERbsprev0,FERbsprev1,FERbsprev2,FERbsprev3,FERbsprev4,1)
+prevFER<-c(FERbsprev0,FERbsprev1,FERbsprev2,FERbsprev3,FERbsprev4,NA)
 
 PIPbsprev0<-sum(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "OZPIP"])/length(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "OZPIP"])
 PIPbsprev1<-sum(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "OZPIP"])/length(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "OZPIP"])
@@ -319,7 +329,7 @@ PIPbsprev2<-sum(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 & 
 PIPbsprev3<-sum(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZPIP"])/length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZPIP"])
 PIPbsprev4<-sum(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZPIP"])/length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZPIP"])
 PIPbsprev5<-sum(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZPIP"])/length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZPIP"])
-prevPIP<-c(PIPbsprev0,PIPbsprev1,PIPbsprev2,PIPbsprev3,PIPbsprev4,1)
+prevPIP<-c(PIPbsprev0,PIPbsprev1,PIPbsprev2,PIPbsprev3,PIPbsprev4,NA)
 
 DSMbsprev0<-sum(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "OZDSM"])/length(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "OZDSM"])
 DSMbsprev1<-sum(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "OZDSM"])/length(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "OZDSM"])
@@ -327,7 +337,7 @@ DSMbsprev2<-sum(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 & 
 DSMbsprev3<-sum(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZDSM"])/length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZDSM"])
 DSMbsprev4<-sum(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZDSM"])/length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZDSM"])
 DSMbsprev5<-sum(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZDSM"])/length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZDSM"])
-prevDSM<-c(DSMbsprev0,DSMbsprev1,DSMbsprev2,DSMbsprev3,1,1)
+prevDSM<-c(DSMbsprev0,DSMbsprev1,DSMbsprev2,DSMbsprev3,NA,NA)
 
 UCTbsprev0<-sum(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "UCT"])/length(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "UCT"])
 UCTbsprev1<-sum(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "UCT"])/length(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "UCT"])
@@ -335,7 +345,7 @@ UCTbsprev2<-sum(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 & 
 UCTbsprev3<-sum(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "UCT"])/length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "UCT"])
 UCTbsprev4<-sum(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "UCT"])/length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "UCT"])
 UCTbsprev5<-sum(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "UCT"])/length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "UCT"])
-prevUCT<-c(UCTbsprev0,UCTbsprev1,UCTbsprev2,UCTbsprev3,1,1)
+prevUCT<-c(UCTbsprev0,UCTbsprev1,UCTbsprev2,UCTbsprev3,NA,NA)
 
 
 
@@ -357,6 +367,7 @@ BLANKbspr2<-length(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2
 BLANKbspr3<-length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "Blank"])
 BLANKbspr4<-length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "Blank"])
 BLANKbspr5<-length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "Blank"])
+propBLANK1<-c(BLANKbspr0,BLANKbspr1,BLANKbspr2,BLANKbspr3,BLANKbspr4,BLANKbspr5)
 propBLANK<-c(BLANKbspr0,BLANKbspr1,BLANKbspr2,BLANKbspr3,BLANKbspr4,BLANKbspr5)/length(spors$bsprev[spors$Treatment == "Blank"])
 
 & spors$Treatment == "UCT"
@@ -367,7 +378,9 @@ FERbspr2<-length(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 &
 FERbspr3<-length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZFER"])
 FERbspr4<-length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZFER"])
 FERbspr5<-length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZFER"])
+propFER1<-c(FERbspr0,FERbspr1,FERbspr2,FERbspr3,FERbspr4,FERbspr5)
 propFER<-c(FERbspr0,FERbspr1,FERbspr2,FERbspr3,FERbspr4,FERbspr5)/length(spors$bsprev[spors$Treatment == "OZFER"])
+
 
 PIPbspr0<-length(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "OZPIP"])
 PIPbspr1<-length(spors$bsprev[spors$ScorePerBite > 0 & spors$ScorePerBite <= 1 & spors$Treatment == "OZPIP"])
@@ -375,6 +388,7 @@ PIPbspr2<-length(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 &
 PIPbspr3<-length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZPIP"])
 PIPbspr4<-length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZPIP"])
 PIPbspr5<-length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZPIP"])
+propPIP1<-c(PIPbspr0,PIPbspr1,PIPbspr2,PIPbspr3,PIPbspr4,PIPbspr5)
 propPIP<-c(PIPbspr0,PIPbspr1,PIPbspr2,PIPbspr3,PIPbspr4,PIPbspr5)/length(spors$bsprev[spors$Treatment == "OZPIP"])
 
 DSMbspr0<-length(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "OZDSM"])
@@ -383,6 +397,7 @@ DSMbspr2<-length(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 &
 DSMbspr3<-length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "OZDSM"])
 DSMbspr4<-length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "OZDSM"])
 DSMbspr5<-length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "OZDSM"])
+propDSM1<-c(DSMbspr0,DSMbspr1,DSMbspr2,DSMbspr3,DSMbspr4,DSMbspr5)
 propDSM<-c(DSMbspr0,DSMbspr1,DSMbspr2,DSMbspr3,DSMbspr4,DSMbspr5)/length(spors$bsprev[spors$Treatment == "OZDSM"])
 
 UCTbspr0<-length(spors$bsprev[spors$ScorePerBite==0 & spors$Treatment == "UCT"])
@@ -391,7 +406,12 @@ UCTbspr2<-length(spors$bsprev[spors$ScorePerBite > 1 & spors$ScorePerBite <= 2 &
 UCTbspr3<-length(spors$bsprev[spors$ScorePerBite > 2 & spors$ScorePerBite <= 3 & spors$Treatment == "UCT"])
 UCTbspr4<-length(spors$bsprev[spors$ScorePerBite > 3 & spors$ScorePerBite <= 4 & spors$Treatment == "UCT"])
 UCTbspr5<-length(spors$bsprev[spors$ScorePerBite > 4 & spors$Treatment == "UCT"])
+propUCT1<-c(UCTbspr0,UCTbspr1,UCTbspr2,UCTbspr3,UCTbspr4,UCTbspr5)
 propUCT<-c(UCTbspr0,UCTbspr1,UCTbspr2,UCTbspr3,UCTbspr4,UCTbspr5)/length(spors$bsprev[spors$Treatment == "UCT"])
+
+
+
+
 
 #########################################
 ##
@@ -400,7 +420,7 @@ propUCT<-c(UCTbspr0,UCTbspr1,UCTbspr2,UCTbspr3,UCTbspr4,UCTbspr5)/length(spors$b
 ###
 ##
 ########################################
-
+ooc #mean number of oocysts per 20% ranked data
 prooc<-ooc/max(ooc)        #mean proportion of oocysts per 20% of ranked data, least to most infected
 logScore   #mean sporozoite score post-bite for each mice
 prevBLANK  #prevalence of blood-stage infection per mouse
@@ -438,147 +458,133 @@ sat.binom<-function(p.vec){
   delta <- p.vec[3]
   gamma <- p.vec[4]
   
-  pred1<- (alpha * ooc[1:6]^beta)/(delta + gamma * ooc[1:6]^beta)
-  pred2<- (alpha * oocFER[1:6]^beta)/(delta + gamma * oocFER[1:6]^beta)
-  pred3<- (alpha * oocDSM[1:6]^beta)/(delta + gamma * oocDSM[1:6]^beta)
-  pred4<- (alpha * oocPIP[1:6]^beta)/(delta + gamma * oocPIP[1:6]^beta)
-  pred5<- (alpha * oocUCT[1:6]^beta)/(delta + gamma * oocUCT[1:6]^beta)
+  pred1a<- (alpha * sort(sample(blanks$oocysts,30))^beta)/(delta + gamma * sort(sample(blanks$oocysts,30))^beta)
+    pred1b<- (alpha * sort(sample(blanks$oocysts,30))^beta)/(delta + gamma * sort(sample(blanks$oocysts,30))^beta)
+    pred1c<- (alpha * sort(sample(blanks$oocysts,30))^beta)/(delta + gamma * sort(sample(blanks$oocysts,30))^beta)
+    pred1d<- (alpha * sort(sample(blanks$oocysts,30))^beta)/(delta + gamma * sort(sample(blanks$oocysts,30))^beta)
+    pred1e<- (alpha * sort(sample(blanks$oocysts,30))^beta)/(delta + gamma * sort(sample(blanks$oocysts,30))^beta)
   
-  spors1<-logScore[1:6]
-  spors2<-logScoreFER[1:6]
-  spors3<-logScoreDSM[1:6]
-  spors4<-logScorePIP[1:6]
-  spors5<-logScoreUCT[1:6]
+  pred2a<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+    pred2b<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+    pred2c<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+    pred2d<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+    pred2e<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
   
-  loglik1<- spors1* log((pred1)+0.00001)+(1-spors1)*log(1-((pred1)-0.00001))
-  loglik2<- spors2* log((pred2)+0.00001)+(1-spors2)*log(1-((pred2)-0.00001))
-  loglik3<- spors3* log((pred3)+0.00001)+(1-spors3)*log(1-((pred3)-0.00001))
-  loglik4<- spors4* log((pred4)+0.00001)+(1-spors4)*log(1-((pred4)-0.00001))
-  loglik5<- spors5* log((pred5)+0.00001)+(1-spors5)*log(1-((pred5)-0.00001))
+  pred3a<- (alpha * sort(sample(OZDSM$oocysts,30))^beta)/(delta + gamma * sort(sample(OZDSM$oocysts,30))^beta)
+    pred3b<- (alpha * sort(sample(OZDSM$oocysts,30))^beta)/(delta + gamma * sort(sample(OZDSM$oocysts,30))^beta)
+    pred3c<- (alpha * sort(sample(OZDSM$oocysts,30))^beta)/(delta + gamma * sort(sample(OZDSM$oocysts,30))^beta)
+    pred3d<- (alpha * sort(sample(OZDSM$oocysts,30))^beta)/(delta + gamma * sort(sample(OZDSM$oocysts,30))^beta)
+    pred3e<- (alpha * sort(sample(OZDSM$oocysts,30))^beta)/(delta + gamma * sort(sample(OZDSM$oocysts,30))^beta)
+  
+  pred4a<- (alpha * sort(sample(OZPIP$oocysts,30))^beta)/(delta + gamma * sort(sample(OZPIP$oocysts,30))^beta)
+    pred4b<- (alpha * sort(sample(OZPIP$oocysts,30))^beta)/(delta + gamma * sort(sample(OZPIP$oocysts,30))^beta)
+    pred4c<- (alpha * sort(sample(OZPIP$oocysts,30))^beta)/(delta + gamma * sort(sample(OZPIP$oocysts,30))^beta)
+    pred4d<- (alpha * sort(sample(OZPIP$oocysts,30))^beta)/(delta + gamma * sort(sample(OZPIP$oocysts,30))^beta)
+    pred4e<- (alpha * sort(sample(OZPIP$oocysts,30))^beta)/(delta + gamma * sort(sample(OZPIP$oocysts,30))^beta)
+  
+  pred5a<- (alpha * sort(sample(UCT$oocysts,30))^beta)/(delta + gamma * sort(sample(UCT$oocysts,30))^beta)
+    pred5b<- (alpha * sort(sample(UCT$oocysts,30))^beta)/(delta + gamma * sort(sample(UCT$oocysts,30))^beta)
+    pred5c<- (alpha * sort(sample(UCT$oocysts,30))^beta)/(delta + gamma * sort(sample(UCT$oocysts,30))^beta)
+    pred5d<- (alpha * sort(sample(UCT$oocysts,30))^beta)/(delta + gamma * sort(sample(UCT$oocysts,30))^beta)
+    pred5e<- (alpha * sort(sample(UCT$oocysts,30))^beta)/(delta + gamma * sort(sample(UCT$oocysts,30))^beta)
+  
+  spors1<-score
+  spors2<-FERscore
+  spors3<-DSMscore
+  spors4<-PIPscore
+  spors5<-UCTscore
+  
+  loglik1a<- spors1* log((pred1a)+0.00001)+(1-spors1)*log(1-((pred1a)-0.00001))
+    loglik1b<- spors1* log((pred1b)+0.00001)+(1-spors1)*log(1-((pred1b)-0.00001))
+    loglik1c<- spors1* log((pred1c)+0.00001)+(1-spors1)*log(1-((pred1c)-0.00001))
+    loglik1d<- spors1* log((pred1d)+0.00001)+(1-spors1)*log(1-((pred1d)-0.00001))
+    loglik1e<- spors1* log((pred1e)+0.00001)+(1-spors1)*log(1-((pred1e)-0.00001))
+  
+  loglik2a<- spors2* log((pred2a)+0.00001)+(1-spors2)*log(1-((pred2a)-0.00001))
+    loglik2b<- spors2* log((pred2b)+0.00001)+(1-spors2)*log(1-((pred2b)-0.00001))
+    loglik2c<- spors2* log((pred2c)+0.00001)+(1-spors2)*log(1-((pred2c)-0.00001))
+    loglik2d<- spors2* log((pred2d)+0.00001)+(1-spors2)*log(1-((pred2d)-0.00001))
+    loglik2e<- spors2* log((pred2e)+0.00001)+(1-spors2)*log(1-((pred2e)-0.00001))
+  
+  loglik3a<- spors3* log((pred3a)+0.00001)+(1-spors3)*log(1-((pred3a)-0.00001))
+    loglik3b<- spors3* log((pred3b)+0.00001)+(1-spors3)*log(1-((pred3b)-0.00001))
+    loglik3c<- spors3* log((pred3c)+0.00001)+(1-spors3)*log(1-((pred3c)-0.00001))
+    loglik3d<- spors3* log((pred3d)+0.00001)+(1-spors3)*log(1-((pred3d)-0.00001))
+    loglik3e<- spors3* log((pred3e)+0.00001)+(1-spors3)*log(1-((pred3e)-0.00001))
+  
+  loglik4a<- spors4* log((pred4a)+0.00001)+(1-spors4)*log(1-((pred4a)-0.00001))
+    loglik4b<- spors4* log((pred4b)+0.00001)+(1-spors4)*log(1-((pred4b)-0.00001))
+    loglik4c<- spors4* log((pred4c)+0.00001)+(1-spors4)*log(1-((pred4c)-0.00001))
+    loglik4d<- spors4* log((pred4d)+0.00001)+(1-spors4)*log(1-((pred4d)-0.00001))
+    loglik4e<- spors4* log((pred4e)+0.00001)+(1-spors4)*log(1-((pred4e)-0.00001))
+  
+  loglik5a<- spors5* log((pred5a)+0.00001)+(1-spors5)*log(1-((pred5a)-0.00001))
+    loglik5b<- spors5* log((pred5b)+0.00001)+(1-spors5)*log(1-((pred5b)-0.00001))
+    loglik5c<- spors5* log((pred5c)+0.00001)+(1-spors5)*log(1-((pred5c)-0.00001))
+    loglik5d<- spors5* log((pred5d)+0.00001)+(1-spors5)*log(1-((pred5d)-0.00001))
+    loglik5e<- spors5* log((pred5e)+0.00001)+(1-spors5)*log(1-((pred5e)-0.00001))
   
   -sum(
-      loglik1,
-       loglik2,
-       loglik3,
-       loglik4,
-       loglik5,
+      loglik1a,loglik1b,loglik1c,loglik1d,loglik1e,
+       loglik2a,loglik2b,loglik2c,loglik2d,loglik2e,
+       loglik3a,loglik3b,loglik3c,loglik3d,loglik3e,
+       loglik4a,loglik4b,loglik4c,loglik4d,loglik4e,
+       loglik5a,loglik5b,loglik5c,loglik5d,loglik5e,
        na.rm=T)
 }
 n.param<-4
-satmod<-optim(c(3.5,0.9999,25,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(3.5,0.999999,100,0.9999))
+
+nc<-seq(0,max(blanks$oocysts),1)
+satmod<-optim(c(3,0.9999,35,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.4),upper=c(4,0.999999,100,0.9999))
 satmod
 predCON<-(satmod$par[1] * nc^satmod$par[2])/(satmod$par[3] + satmod$par[4] * nc^satmod$par[2])
 
-satmodFER<-optim(c(3.5,0.9999,25,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(3.5,0.999999,100,0.9999))
+ncFER<-seq(0,max(OZFER$oocysts),1)
+satmodFER<-optim(c(3,0.9999,15,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,1,0.4),upper=c(3.5,0.999999,100,0.9999))
 satmodFER
-predFER<-(satmodFER$par[1] * nc^satmodFER$par[2])/(satmodFER$par[3] + satmodFER$par[4] * nc^satmodFER$par[2])
+predFER<-(satmodFER$par[1] * ncFER^satmodFER$par[2])/(satmodFER$par[3] + satmodFER$par[4] * ncFER^satmodFER$par[2])
 
-satmodDSM<-optim(c(3.5,0.9999,25,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(3.5,0.999999,100,0.9999))
+ncDSM<-seq(0,max(OZDSM$oocysts),1)
+satmodDSM<-optim(c(2,0.9999,15,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,10,0.4),upper=c(3.5,0.999999,100,0.9999))
 satmodDSM
-predDSM<-(satmodDSM$par[1] * nc^satmodDSM$par[2])/(satmodDSM$par[3] + satmodDSM$par[4] * nc^satmodDSM$par[2])
+predDSM<-(satmodDSM$par[1] * ncDSM^satmodDSM$par[2])/(satmodDSM$par[3] + satmodDSM$par[4] * ncDSM^satmodDSM$par[2])
 
-satmodPIP<-optim(c(3.5,0.9999,25,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(3.5,0.999999,100,0.9999))
+ncPIP<-seq(0,max(OZPIP$oocysts),1)
+satmodPIP<-optim(c(3,0.9999,15,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(3.5,0.999999,100,0.9999))
 satmodPIP
-predPIP<-(satmodPIP$par[1] * nc^satmodPIP$par[2])/(satmodPIP$par[3] + satmodPIP$par[4] * nc^satmodPIP$par[2])
+predPIP<-(satmodPIP$par[1] * ncPIP^satmodPIP$par[2])/(satmodPIP$par[3] + satmodPIP$par[4] * ncPIP^satmodPIP$par[2])
 
-satmodUCT<-optim(c(3.5,0.9999,25,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(3.5,0.999999,100,0.9999))
+ncUCT<-seq(0,max(UCT$oocysts),1)
+satmodUCT<-optim(c(3.5,0.9999,25,0.9),sat.binom,method="L-BFGS-B",lower=c(1,0.4,15,0.9),upper=c(2.2,0.999999,100,0.9999))
 satmodUCT
-predUCT<-(satmodUCT$par[1] * nc^satmodUCT$par[2])/(satmodUCT$par[3] + satmodUCT$par[4] * nc^satmodUCT$par[2])
+predUCT<-(satmodUCT$par[1] * ncUCT^satmodUCT$par[2])/(satmodUCT$par[3] + satmodUCT$par[4] * ncUCT^satmodUCT$par[2])
 
-nc<-seq(0,300,1)
 
-plot(ooc,logScore,ylim=c(0,5),bty="n",xlim=c(0,300),
+plot(sort(sample(blanks$oocysts,30)),score,ylim=c(0,5),bty="n",xlim=c(0,300),
      las=1,xlab="Oocysts",ylab="Sporozoites",cex=1.25,col="chartreuse4",pch=16)
-points(oocFER,logScoreFER,col="red",pch=20);points(oocDSM,logScoreDSM,col="blue",pch=20);
-points(oocPIP,logScorePIP,col="green",pch=20);points(oocPIP,logScorePIP,col="orange",pch=20)
+points(sort(sample(blanks$oocysts,30)),score,col="chartreuse4",pch=16)
+points(sort(sample(OZFER$oocysts,30)),FERscore,col="red",pch=20);
+points(sort(sample(OZDSM$oocysts,30)),DSMscore,col="blue",pch=20);
+points(sort(sample(OZPIP$oocysts,30)),PIPscore,col="blueviolet",pch=20);
+points(sort(sample(UCT$oocysts,30)),UCTscore,col="orange",pch=20)
+
+ncFER<-seq(1,max(OZFER$oocysts),3.36)## 101/30
+ncDSM<-seq(1,max(OZDSM$oocysts),6.26)## 188/30
+ncPIP<-seq(1,max(OZPIP$oocysts),6.53)## 196/30
+ncUCT<-seq(1,max(UCT$oocysts),5.93)## 178/30
+  
+  predCON<-(2.8885427 * nc^0.9665085)/(33.8804145 + 0.8720424 * nc^0.9665085)
+  predFER<-(2.9633314 * ncFER^0.9753062)/(16.1740491 + 0.9119043 * ncFER^0.9753062)
+  predDSM<-(1.9888327 * ncDSM^0.9999011)/(15.9492211 + 0.9011156 * ncDSM^0.9999011)
+  predPIP<-(2.9875322 * ncPIP^0.9962143)/(15.5401245 + 0.9000538 * ncPIP^0.9962143)
+  predUCT<-(2.2 * ncUCT^0.9999)/(24.9996919 + 0.9000031 * ncUCT^0.9999)
 
 
-  
-  predCON<-(3.4999292 * nc^0.999999)/(23.6197325 + 0.9000661 * nc^0.99999)
-  predFER<-(3.5 * nc^0.9999318)/(24.7097148 + 0.9 * nc^0.9999318)
-  predDSM<-(3.4938832 * nc^0.9796118)/(15.0012052 + 0.9039049 * nc^0.9796118)
-  predPIP<-(3.4999387 * NC^0.9999990)/(22.3078003 + 0.9000538 * NC^0.9000538)
-  predUCT<-(3.4909695 * nc^0.9490303)/(25.0010236 + 0.9062446 * nc^0.9490303)
-
-lines(nc,predCON,lwd=2,col="black")
-    lines(nc,predFER,lwd=2,col="red")
-        lines(nc,predDSM,lwd=2,col="blue")
-            lines(nc,predPIP,lwd=2,col="green")
-                lines(nc,predUCT,lwd=2,col="orange")
-#
-## Logistic fit
-#
-satU.binom<-function(p.vec){
-  
-  alpha  <- p.vec[1]
-  beta  <- p.vec[2]
-  delta <- p.vec[3]
-  gamma <- p.vec[4]
-  
-  
-  pred1<- (alpha * oocU[1:6]^beta)/(delta + gamma * oocU[1:6]^beta)
-  pred2<- (alpha * oocFERU[1:6]^beta)/(delta + gamma * oocFERU[1:6]^beta)
-  pred3<- (alpha * oocDSMU[1:6]^beta)/(delta + gamma * oocDSMU[1:6]^beta)
-  pred4<- (alpha * oocPIPU[1:6]^beta)/(delta + gamma * oocPIPU[1:6]^beta)
-  pred5<- (alpha * oocUCTU[1:6]^beta)/(delta + gamma * oocUCTU[1:6]^beta)
-  
-  spors1<-logScoreU[1:6]
-  spors2<-logScoreFERU[1:6]
-  spors3<-logScoreDSMU[1:6]
-  spors4<-logScorePIPU[1:6]
-  spors5<-logScoreUCTU[1:6]
-  
-  loglik1<- spors1* log((pred1)+0.00001)+(1-spors1)*log(1-((pred1)-0.00001))
-  loglik2<- spors1* log((pred2)+0.00001)+(1-spors2)*log(1-((pred2)-0.00001))
-  loglik3<- spors1* log((pred3)+0.00001)+(1-spors3)*log(1-((pred3)-0.00001))
-  loglik4<- spors1* log((pred4)+0.00001)+(1-spors4)*log(1-((pred4)-0.00001))
-  loglik5<- spors1* log((pred5)+0.00001)+(1-spors5)*log(1-((pred5)-0.00001))
-  
-  -sum(loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T)
-}
-n.param<-4
-satmodU<-optim(c(4,0.99,20,0.99),satU.binom,method="L-BFGS-B",lower=c(1,0.8,10,0.750),upper=c(8,0.9999,200,0.9999))
-satmodU
-
-
-pred<-(satmodU$par[1] * nc^satmodU$par[2])/(satmodU$par[3] + satmodU$par[4] * nc^satmodU$par[2])
-points(oocU,logScoreU);points(oocL,logScoreL)
-lines(nc,pred,lwd=2,col="red",lty=2)
-
-satL.binom<-function(p.vec){
-  
-  alpha  <- p.vec[1]
-  beta  <- p.vec[2]
-  delta <- p.vec[3]
-  gamma <- p.vec[4]
-  
-  
-  pred1<- (alpha * oocL[1:6]^beta)/(delta + gamma * oocL[1:6]^beta)
-  pred2<- (alpha * oocFERL[1:6]^beta)/(delta + gamma * oocFERL[1:6]^beta)
-  pred3<- (alpha * oocDSML[1:6]^beta)/(delta + gamma * oocDSML[1:6]^beta)
-  pred4<- (alpha * oocPIPL[1:6]^beta)/(delta + gamma * oocPIPL[1:6]^beta)
-  pred5<- (alpha * oocUCTL[1:6]^beta)/(delta + gamma * oocUCTL[1:6]^beta)
-  
-  spors1<-logScoreL[1:6]
-  spors2<-logScoreFERL[1:6]
-  spors3<-logScoreDSML[1:6]
-  spors4<-logScorePIPL[1:6]
-  spors5<-logScoreUCTL[1:6]
-  
-  loglik1<- spors1* log((pred1)+0.00001)+(1-spors1)*log(1-((pred1)-0.00001))
-  loglik2<- spors1* log((pred2)+0.00001)+(1-spors2)*log(1-((pred2)-0.00001))
-  loglik3<- spors1* log((pred3)+0.00001)+(1-spors3)*log(1-((pred3)-0.00001))
-  loglik4<- spors1* log((pred4)+0.00001)+(1-spors4)*log(1-((pred4)-0.00001))
-  loglik5<- spors1* log((pred5)+0.00001)+(1-spors5)*log(1-((pred5)-0.00001))
-  
-  -sum(loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T)
-}
-n.param<-4
-satmodL<-optim(c(5,0.97,45,0.99),satL.binom,method="L-BFGS-B",lower=c(3.5,0.8,0,0.8),upper=c(20,0.9999,200,0.9999))
-satmodL
-
-pred<-(satmodL$par[1] * nc^satmodL$par[2])/(satmodL$par[3] + satmodL$par[4] * nc^satmodL$par[2])
-lines(nc,pred,lwd=2,col="red",lty=2)
+lines(nc,predCON,lwd=2,col="chartreuse4")
+    lines(ncFER,predFER,lwd=2,col="red")
+        lines(ncDSM,predDSM,lwd=2,col="blue")
+            lines(ncPIP,predPIP,lwd=2,col="blueviolet")
+                lines(ncUCT,predUCT,lwd=2,col="orange")
 
 
 ####********Including the data from TC's work*********#######
@@ -591,7 +597,211 @@ lines(nc,pred,lwd=2,col="red",lty=2)
 ##
 #################################################
 
+############################################
+##
+###
+#### Create distributions of the data
+###
+##
+#################################################
+
+
+blanksdistprev<-c(rnorm(propBLANK1[1], mean = prevBLANK[1], sd = (prevBLANK[2]-prevBLANK[1])/2),
+                  rnorm(propBLANK1[2], mean = prevBLANK[2], sd = (prevBLANK[3]-prevBLANK[2])/2),
+                  rnorm(propBLANK1[3], mean = prevBLANK[3], sd = (prevBLANK[4]-prevBLANK[3])/2),
+                  rnorm(propBLANK1[4], mean = prevBLANK[4], sd = (prevBLANK[5]-prevBLANK[4])/2),
+                  rnorm(propBLANK1[5], mean = prevBLANK[5], sd = (prevBLANK[6]-prevBLANK[5])/2))
+
+FERdistprev<-c(rnorm(propFER1[1], mean = prevFER[1], sd = (prevFER[2]-prevFER[1])/2),
+               rnorm(propFER1[2], mean = prevFER[2], sd = (prevFER[3]-prevFER[2])/2),
+               rnorm(propFER1[3], mean = prevFER[3], sd = (prevFER[4]-prevFER[3])/2),
+               rnorm(propFER1[4], mean = prevFER[4], sd = (prevFER[5]-prevFER[4])/2),
+               rnorm(propFER1[5], mean = prevFER[5], sd = (prevFER[6]-prevFER[5])/2))
+
+DSMdistprev<-c(rnorm(propDSM1[1], mean = prevDSM[1], sd = (prevDSM[2]-prevDSM[1])/2),
+               rnorm(propDSM1[2], mean = prevDSM[2], sd = (prevDSM[3]-prevDSM[2])/2),
+               rnorm(propDSM1[3], mean = prevDSM[3], sd = (prevDSM[4]-prevDSM[3])/2),
+               rnorm(propDSM1[4], mean = prevDSM[4], sd = (prevDSM[5]-prevDSM[4])/2),
+               rnorm(propDSM1[5], mean = prevDSM[5], sd = (prevDSM[6]-prevDSM[5])/2))
+
+PIPdistprev<-c(rnorm(propPIP1[1], mean = prevPIP[1], sd = (prevPIP[2]-prevPIP[1])/2),
+               rnorm(propPIP1[2], mean = prevPIP[2], sd = (prevPIP[3]-prevPIP[2])/2),
+               rnorm(propPIP1[3], mean = prevPIP[3], sd = (prevPIP[4]-prevPIP[3])/2),
+               rnorm(propPIP1[4], mean = prevPIP[4], sd = (prevPIP[5]-prevPIP[4])/2),
+               rnorm(propPIP1[5], mean = prevPIP[5], sd = (prevPIP[6]-prevPIP[5])/2))
+
+UCTdistprev<-c(rnorm(propUCT1[1], mean = prevUCT[1], sd = (prevUCT[2]-prevUCT[1])/2),
+               rnorm(propUCT1[2], mean = prevUCT[2], sd = (prevUCT[3]-prevUCT[2])/2),
+               rnorm(propUCT1[3], mean = prevUCT[3], sd = (prevUCT[4]-prevUCT[3])/2),
+               rnorm(propUCT1[4], mean = prevUCT[4], sd = (prevUCT[5]-prevUCT[4])/2),
+               rnorm(propUCT1[5], mean = prevUCT[5], sd = (prevUCT[6]-prevUCT[5])/2))
+
+
+prev1temp<-c(0,0,0,0,sort(blanksdistprev[1:23])) ##match up the number of zeros in score because 0 sporozoites cannot cause blood infection
+prev1<-ifelse(prev1temp<=1,prev1temp,1)      
+prevFER1<-c(0,0,0,0,0,0,sort(FERdistprev[2:25]))
+prevDSM1<-c(0,0,0,0,sort(DSMdistprev[3:28]))
+prevPIP1<-c(0,0,0,sort(PIPdistprev[1:27]))
+prevUCT1<-c(0,0,0,0,0,0,sort(UCTdistprev[1:29]))
+
+
+sort(score)
 #
+## Logistic fit
+#
+
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * sort(score)[1:27])) / (1 + exp(a + b * sort(score)[1:27])) ) + 0
+        predFER<- ((exp(a + b * sort(FERscore))) / (1 + exp(a + b * sort(FERscore))) )  
+              predDSM<- ((exp(a + b * sort(DSMscore))) / (1 + exp(a + b * sort(DSMscore))) )  
+                    predPIP<-  ((exp(a + b * sort(PIPscore))) / (1 + exp(a + b * sort(PIPscore))) )  
+                          predUCT<-  ((exp(a + b * c(sort(UCTscore),rep(max(UCTscore),5)))) / (1 + exp(a + b * c(sort(UCTscore),rep(max(UCTscore),5)))) )  
+  
+  prev1<-prev1   
+        prevFER1<-prevFER1
+              prevDSM1<-prevDSM1
+                    prevPIP1<-prevPIP1
+                          prevUCT1<-prevUCT1
+  
+  loglik1a<- prev1* log((pred1a)+0.0000001)+(1-prev1)*log(1-((pred1a)-0.0000001))
+         loglikf<- prevFER1* log((predFER)+0.00001)+(1-prevFER1)*log(1-((predFER)-0.00001))
+              loglikd<- prevDSM1* log((predDSM)+0.00001)+(1-prevDSM1)*log(1-((predDSM)-0.00001))
+                    loglikp<- prevPIP1* log((predPIP)+0.00001)+(1-prevPIP1)*log(1-((predPIP)-0.00001))
+                          logliku<- prevUCT1* log((predUCT)+0.00001)+(1-prevUCT1)*log(1-((predUCT)-0.00001))
+  
+  
+  -sum(
+    loglik1a,
+          loglikf,
+                loglikd,
+                      loglikp,
+                            logliku,
+    na.rm=T)
+}
+
+
+n.param<-2
+
+nc<-seq(0,4,0.01)
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+pred<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) ) 
+pred[1]
+
+
+logmodfer<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmodfer
+predfer<-(exp(logmodfer$par[1] + logmodfer$par[2] * nc)) / (1 + exp(logmodfer$par[1] + logmodfer$par[2] * nc))
+
+logmoddsm<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-100,-100),upper=c(-4,100))
+logmoddsm
+preddsm<-(exp(logmoddsm$par[1] + logmoddsm$par[2] * nc)) / (1 + exp(logmoddsm$par[1] + logmoddsm$par[2] * nc))
+
+logmodpip<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,0),upper=c(10,10))
+logmodpip
+predpip<-(exp(logmodpip$par[1] + logmodpip$par[2] * nc)) / (1 + exp(logmodpip$par[1] + logmodpip$par[2] * nc))
+
+logmoduct<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmoduct
+preduct<-(exp(logmoduct$par[1] + logmoduct$par[2] * nc)) / (1 + exp(logmoduct$par[1] + logmoduct$par[2] * nc))
+preduct[1]
+
+
+plot(sort(score)[1:27],prev1,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
+
+points(sort(FERscore),sort(prevFER1),pch=20,col="red")
+points(sort(DSMscore),sort(prevDSM1),pch=20,col="blue")
+points(sort(PIPscore),sort(prevPIP1),pch=20,col="blueviolet")
+points(c(sort(UCTscore),rep(max(UCTscore),5)),sort(prevUCT1),pch=20,col="orange")
+
+
+      PREDcon<-(exp(-6.966544 + 6.401925 * nc)) / (1 + exp(-6.966544 + 6.401925 * nc))
+            PREDfer<-(exp(-2.607061 + 2.242994 * nc)) / (1 + exp(-2.607061 + 2.242994 * nc))
+                  PREDdsm<-(exp(-4 + 4.3438 * nc)) / (1 + exp(-4 + 4.3438 * nc))
+                        PREDpip<-(exp(-4 + 4.062189 * nc)) / (1 + exp(-4 + 4.062189 * nc))
+                              PREDuct<-(exp(-1.921384 + 2.536381 * nc)) / (1 + exp(-1.921384 + 2.536381 * nc))
+
+lines(nc,pred,lwd=2)
+
+lines(nc,predfer,lwd=2,col="red")
+lines(nc,preddsm,lwd=2,col="blue")
+lines(nc,predpip,lwd=2,col="blueviolet")
+lines(nc,preduct,lwd=2,col="orange")
+
+########################################################################
+##
+###
+####
+#####  Ooocysts to Blood stage infection
+####
+###
+##
+#######################################################################
+
+
+##BLANKS
+a=-6.966544
+b=6.401925
+alpha=2.8885427
+beta=0.9665085
+delta=33.8804145
+gamma=0.9665085
+
+
+X1<-max(blanks$oocysts)
+
+BLANKfitooc <- ((exp(a + b * ((alpha * seq(0,X1,1)^beta)/(delta + gamma * seq(0,X1,1)^beta)))) / 
+                  (1 + exp(a + b * ((alpha * seq(0,X1,1)^beta)/(delta + gamma * seq(0,X1,1)^beta)))) )
+
+plot(seq(0,X1,1),BLANKfitooc,col="aquamarine4")
+
+##FER
+a=-2.607061
+b=2.242994
+alpha=2.9633314
+beta=0.9753062
+delta=16.1740491
+gamma=0.9119043
+
+
+X1<-max(OZFER$oocysts)
+
+FERfitooc <- ((exp(a + b * ((alpha * seq(0,X1,1)^beta)/(delta + gamma * seq(0,X1,1)^beta)))) / 
+                  (1 + exp(a + b * ((alpha * seq(0,X1,1)^beta)/(delta + gamma * seq(0,X1,1)^beta)))) )
+
+points(seq(0,X1,1),FERfitooc,col="chocolate1")
+
+
+predCON<-(2.8885427 * nc^0.9665085)/(33.8804145 + 0.8720424 * nc^0.9665085)
+predFER<-(2.9633314 * ncFER^0.9753062)/(16.1740491 + 0.9119043 * ncFER^0.9753062)
+
+
+
+PREDcon<-(exp(-6.966544 + 6.401925 * nc)) / (1 + exp(-6.966544 + 6.401925 * nc))
+PREDfer<-(exp(-2.607061 + 2.242994 * nc)) / (1 + exp(-2.607061 + 2.242994 * nc))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Logistic fit
 #
 
@@ -609,7 +819,7 @@ log.binom<-function(p.vec){
   predUCT<- ((exp(a + b * c(logScoreUCT[1:4],2.04,2.04))) / (1 + exp(a + b * c(logScoreUCT[1:4],2.04,2.04))) )  
   
   
-  prev1<-prevMouseData[1:6]
+  prev1<-prevBLANK[1:6]
   prev2<-prevMouseDataTC[1:6]
   #prev3<-data.mouse.a$meanPar[data.mouse.a$rm.prev > 0]
   prevFER1<-prevFER
@@ -662,7 +872,7 @@ preduct<-(exp(logmoduct$par[1] + logmoduct$par[2] * nc)) / (1 + exp(logmoduct$pa
 
 
 
-plot(logScore,prevMouseData,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
+plot(logScore[1:5],prevBLANK,ylim=c(0,1),bty="n",xlim=c(0,4),las=1,xlab="Sporozoite Score",ylab="Prevalence blood stage infection",cex=1.25,col="chartreuse4",pch=16)
 points(logScoreTC,prevMouseDataTC)
 #points(data.mouse.a$ScorePerBite[data.mouse.a$rm.prev > 0],data.mouse.a$meanPar[data.mouse.a$rm.prev > 0],pch=20)
 
@@ -846,6 +1056,10 @@ lines(fitdat,predUCTc,lwd=2,col="orange")
 ################################################################################
 
 ##e.g. for blank
+##fewer sporozoites cause infection...
+##for example, after logScore = 2 then all sporozoites cause infection. 
+
+
 
 sort(blanks$oocysts)
 predblank2<-numeric(length(blanks$oocysts))

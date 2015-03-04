@@ -22,6 +22,7 @@ score2<- spors$ScorePerBite[spors$ScorePerBite >= 1 & spors$ScorePerBite<2  & sp
 score3<- spors$ScorePerBite[spors$ScorePerBite >= 2 & spors$ScorePerBite<3  & spors$Treatment == "OZFER"]
 score4<- spors$ScorePerBite[spors$ScorePerBite >= 3 & spors$ScorePerBite<4  & spors$Treatment == "OZFER"]
 
+FERscore<-c(score0,score1,score2,score3,score4,score5)
 logScoreDFER<-c(mean(score0),mean(score1),mean(score2),mean(score3),max(score4))
 a1<-numeric(10000)
 a2<-numeric(10000)
@@ -68,19 +69,27 @@ delta <- p.vec[3]
 gamma <- p.vec[4]
   
   
-pred1<- (alpha * oocD1[1:5]^beta)/(delta + gamma * oocD1[1:5]^beta)
- 
+pred1<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+pred2<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+pred3<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+pred4<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+pred5<- (alpha * sort(sample(OZFER$oocysts,30))^beta)/(delta + gamma * sort(sample(OZFER$oocysts,30))^beta)
+
   
 ###  a <- p.vec[1]
 ###  b <- p.vec[2]
   
 ###  pred1<- 3.5 * ((exp(a + b * oocD1[1:6])) / (1 + exp(a + b * oocD1[1:6])) )
   
-  spors1<-logScoreDFER[1:5]
+  spors1<-FERscore
   
   loglik1<- spors1* log((pred1)+0.00001)+(1-spors1)*log(1-((pred1)-0.00001))
-  
-  -sum(loglik1,na.rm=T)
+loglik2<- spors1* log((pred2)+0.00001)+(1-spors1)*log(1-((pred2)-0.00001))
+loglik3<- spors1* log((pred3)+0.00001)+(1-spors1)*log(1-((pred3)-0.00001))
+loglik4<- spors1* log((pred4)+0.00001)+(1-spors1)*log(1-((pred4)-0.00001))
+loglik5<- spors1* log((pred5)+0.00001)+(1-spors1)*log(1-((pred5)-0.00001))
+
+  -sum(loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T)
 }
 n.param<-4
 satmod2FER<-optim(c(3.5,0.8,15,0.95),sat.binomFER,method="L-BFGS-B",
@@ -97,8 +106,11 @@ par(mfrow=c(1,1))
 nc<-seq(0,max(oocdata1),1)
 predFER<-(satmod2FER$par[1] * nc^satmod2FER$par[2])/(satmod2FER$par[3] + satmod2FER$par[4] * nc^satmod2FER$par[2])
 ###pred2<-3.5*((exp(satmod2$par[1]  + satmod2$par[2]  * nc)) / (1 + exp(satmod2$par[1]  + satmod2$par[2]  * nc)) ) 
-plot(oocD1,logScoreDFER,ylim=c(0,5),bty="n",xlim=c(0,300),
+plot(sort(sample(OZFER$oocysts,30)),FERscore,ylim=c(0,5),bty="n",xlim=c(0,300),
      las=1,xlab="Oocysts",ylab="Sporozoites",cex=1.25,col="chartreuse4",pch=16)
+points(sort(sample(OZFER$oocysts,30)),FERscore,col="chartreuse4",pch=16)
+
+
 lines(nc,predFER,lwd=2,col="red")
 
 
