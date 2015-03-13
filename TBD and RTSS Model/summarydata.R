@@ -163,8 +163,7 @@ length(oocATV1)/5
 
 ATV1<-c(0,mean(oocATV1[1:17]),mean(oocATV1[18:35]),mean(oocATV1[36:52]),mean(oocATV1[53:70]),mean(oocATV1[71:88]))
 
-
-
+mean(oocATV$Oocyst[oocATV$Round==3]);sd(oocATV$Oocyst[oocATV$Round==3]);length(oocATV$Oocyst[oocATV$Round==3])
 ##########################################################################
 ## 
 ##  ##       ##     #########        ##    ###       ##      ###
@@ -186,6 +185,10 @@ for (i in 1:length(spors$Round)){
   spors$sporozoites[i]<-sum(spors[i,5:14],na.rm=TRUE)}
 
 spors$ScorePerBite<-spors$sporozoites/spors$Bites
+
+mean(spors$ScorePerBite[spors$Treatment == "Blank"])
+sd(spors$ScorePerBite[spors$Treatment == "Blank"])
+length(spors$ScorePerBite[spors$Treatment == "Blank"])
 
 score0<- spors$ScorePerBite[spors$ScorePerBite == 0 & spors$Treatment == "Blank"]
 score1<- spors$ScorePerBite[spors$ScorePerBite > 0 & spors$ScorePerBite<1 & spors$Treatment == "Blank"]
@@ -210,6 +213,22 @@ for (i in 1:10000) a4[i] <-sample(score4,replace=TRUE)
 ao4<-quantile(a4,c(0.025,0.975))
 logScoreL<-c(0,ao1[1],ao2[1],ao3[1],ao4[1],max(score4))
 logScoreU<-c(0,ao1[2],ao2[2],ao3[2],ao4[2],max(score4))
+
+mean(spors$ScorePerBite[spors$Treatment == "OZFER"])
+sd(spors$ScorePerBite[spors$Treatment == "OZFER"])
+length(spors$ScorePerBite[spors$Treatment == "OZFER"])
+
+mean(spors$ScorePerBite[spors$Treatment == "OZDSM"])
+sd(spors$ScorePerBite[spors$Treatment == "OZDSM"])
+length(spors$ScorePerBite[spors$Treatment == "OZDSM"])
+
+mean(spors$ScorePerBite[spors$Treatment == "OZPIP"])
+sd(spors$ScorePerBite[spors$Treatment == "OZPIP"])
+length(spors$ScorePerBite[spors$Treatment == "OZPIP"])
+
+mean(spors$ScorePerBite[spors$Treatment == "UCT"])
+sd(spors$ScorePerBite[spors$Treatment == "UCT"])
+length(spors$ScorePerBite[spors$Treatment == "UCT"])
 
 
 score0<- spors$ScorePerBite[spors$ScorePerBite == 0 & spors$Treatment == "OZFER"]
@@ -326,6 +345,7 @@ for (i in 1:length(spors2$Round)){
 
 spors2$ScorePerBite<-spors2$sporozoites/spors2$Bites
 
+mean(spors2$ScorePerBite);sd(spors2$ScorePerBite);length(spors2$ScorePerBite);
 score0<- spors2$ScorePerBite[spors2$ScorePerBite == 0]
 score1<- spors2$ScorePerBite[spors2$ScorePerBite > 0 & spors2$ScorePerBite<1]
 score2<- spors2$ScorePerBite[spors2$ScorePerBite >= 1 & spors2$ScorePerBite<2]
