@@ -1,4 +1,4 @@
-
+library(reshape)
 oocysts<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\UCT OZPIP FER DSM Feb2015\\M2M SporozoiteScores\\OocystIntensity.txt",header=TRUE)
 blanks<-subset(oocysts,Treatment=="Blank")
 OZFER<-subset(oocysts,Treatment=="OZFER")
@@ -60,6 +60,8 @@ nobite<-c(100,0,0,0,0)
 SPORtab<-data.frame(sporocounts,nobite,aBit1sp,bBit2sp,cBit5sp,dBit10sp)
 scores<-rep(sporocounts,5);bites<-c(nobite,aBit1sp,bBit2sp,cBit5sp,dBit10sp);group<-c(rep("Nobite",5),rep("aBit1sp",5),rep("bBit2sp",5),rep("cBit5sp",5),rep("dBit10sp",5))
 SPORtab2<-data.frame(scores,bites,group)
+
+
 sportab<-cast(SPORtab2, group ~ scores, mean, value = 'bites')
 
 
@@ -79,8 +81,11 @@ plot(sporscores~meanooc)
 meanooc2<-c(unique(meanooc))
 meanspor<-c(0,mean(sporsBites1),mean(sporsBites2[sporsBites2<5]),mean(sporsBites5),mean(sporsBites10))
 
+library(beanplot)
 
 plot(meanspor~meanooc2)
+
+
 
 log.binom<-function(p.vec){
   
@@ -118,9 +123,11 @@ n.param<-3
 gommod<-optim(c(0.75,-2,-0.5),gom.binom,method="L-BFGS-B",lower=c(0.5,-10,-5),upper=c(0.99,-1,-0.0001))
 gommod
 
+nc<-seq(0,40,1)
+
 pred2<-   gommod$par[1] * exp (gommod$par[2] * exp(gommod$par[3] * nc))
 plot(meanspor~meanooc2)
-lines(nc,pred2,col="red",lwd=2)
+lines(nc,pred2,col="yellow",lwd=2)
 
 #####
 #####
@@ -147,9 +154,9 @@ gommod<-optim(c(0.75,-2,-0.5),gom.binom,method="L-BFGS-B",lower=c(0.5,-10,-5),up
 gommod
 
 pred2<-   gommod$par[1] * exp (gommod$par[2] * exp(gommod$par[3] * nc))
-plot(meanspor~meanooc2)
-lines(nc,pred2,col="red",lwd=2,lty=2)
-
+plot(meanspor~meanooc2, ylim=c(0,4))
+lines(nc,pred2,col="chocolate2",lwd=3,lty=2)
+points(meanspor~meanooc2,col="chocolate2",pty=16)
 #
 ## CIs for estimates from gompertz model
 #
@@ -171,7 +178,7 @@ for(i in 1:length(pds$a)){
   pds$modcom[i]<-ifelse(1-pchisq(2*(max(ci.fit,optim.model)-min(ci.fit,optim.model)),1) < 0.05,"discard","keep")
   #print(i)
 }
-pds.new<-subset(pds,pds$fmodcom=="keep")
+pds.new<-subset(pds,pds$modcom=="keep")
 
 length(pds$a)
 length(pds.new$a)
@@ -185,24 +192,494 @@ min(pds.new$c)
 #
 ##
 
-  q1a<-quantile(pds.new$a,0.025)
-  q2a<-quantile(pds.new$a,0.975)
-  q1b<-quantile(pds.new$b,0.025)
-  q2b<-quantile(pds.new$b,0.975)
-  q1c<-quantile(pds.new$c,0.025)
-  q2c<-quantile(pds.new$c,0.975)
+  q1a<-quantile(pds.new$a,0.025)##0.7868687
+  q2a<-quantile(pds.new$a,0.975)##0.8111111
+  q1b<-quantile(pds.new$b,0.025)##-11.85859 
+  q2b<-quantile(pds.new$b,0.975)##-5.212121
+  q1c<-quantile(pds.new$c,0.025)##-0.5686869 
+  q2c<-quantile(pds.new$c,0.975)##-0.3818182
 
-}
-pred2upper<-   q2a * exp (q2b * exp(q2c * nc))
-pred2lower<-   q1a * exp (q1b * exp(q1c * nc))
+
+pred2upper<-   q1a * exp (q1b * exp(q2c * nc))
+pred2lower<-   q2a * exp (q2b * exp(q1c * nc))
+
+pred2upper<-   0.7868687 * exp (-11.85859 * exp(-0.3818182 * nc))
+pred2lower<-   0.8111111 * exp (-5.212121* exp(-0.5686869 * nc))
+
 lines(pred2upper~nc)
 lines(pred2lower~nc)
 
+beanplot(0,0,0,0,0,0,sporsBites1,0,0,0,0,0,sporsBites2[sporsBites2<5],0,0,0,sporsBites5,
+         0,0,0,0,0,0,0,0,0,0,0,0,sporsBites10,xaxt="n",
+         ylab="Sporozoite scores",xlab="Number of oocysts")
+
+
+axis(1,at=seq(from=0, to=30,1),labels=seq(0,30,1))
 
 polygon(c(nc, rev(nc)),c(pred2upper,rev(pred2lower)),border=NA, col="chartreuse4")
+lines(nc,pred2,col="yellow",lwd=2)
+points(meanspor~meanooc2,col="chocolate2",pch=16)
+#############################################
+##
+###Try probability
+###
+##
+#################
+bit1ooc<-sort(c(oocContB1,oocATVB1))
+bit1spor<-sort(sporsBites1)
+length(bit1ooc)
+
+##0 - 441 times
+##1 - 13 times
+##2 - 11 times
+##3 - 12 times
+##4 - 1 time
+##5 - 2 times
+##6 - 4 times
+
+freqooc<-numeric(length(unique(bit1ooc)))
+for (i in 1:length(unique(bit1ooc))){ 
+  freqooc[i]<-sum(ifelse(bit1ooc==unique(bit1ooc)[i],1,0))}
+
+freqspor<-numeric(length(unique(bit1spor)))
+for (i in 1:length(unique(bit1spor))){
+  freqspor[i]<-sum(ifelse(bit1spor==unique(bit1spor)[i],1,0))}
+
+propbit1spor<-matrix(nrow=length(freqooc),ncol=length(freqspor),data=NA)
+propbit1spor<-as.data.frame(propbit1spor)
+colnames(propbit1spor)[1]<-"sporos0"
+colnames(propbit1spor)[2]<-"sporos1"
+colnames(propbit1spor)[3]<-"sporos2"
+colnames(propbit1spor)[4]<-"sporos3"
+colnames(propbit1spor)[5]<-"sporos4"
+propbit1spor[1,1:5]<-c(freqooc[1],0,0,0,0)
+
+for (j in 2:length(freqooc)){
+for (i in 1:length(freqspor)){
+propbit1spor[j,i]<-(freqooc[j]*(freqspor[i]/length(bit1spor)))
+}}
+sum(propbit1spor[1,])
+head(propbit1spor)
+
+propbit1spor$bit1ooc<-c(unique(bit1ooc))
+
+propbit1spor$sumprob<-numeric(length(propbit1spor$bit1ooc))
+for (i in 1:length(propbit1spor$bit1ooc)){
+propbit1spor$sumprob[i]<-sum(propbit1spor[i,1:5])}
+
+propbit1spor$MBR<-rep("Bite1",length(propbit1spor$bit1ooc))
+
+bit2ooc<-sort(c(oocContB2,oocATVB2))
+bit2spor<-sort(sporsBites2)
+length(bit2ooc)
+
+##0 - 441 times
+##1 - 13 times
+##2 - 11 times
+##3 - 12 times
+##4 - 1 time
+##5 - 2 times
+##6 - 4 times
+
+freqooc<-numeric(length(unique(bit2ooc)))
+for (i in 1:length(unique(bit2ooc))){ 
+  freqooc[i]<-sum(ifelse(bit2ooc==unique(bit2ooc)[i],1,0))}
+
+freqspor<-numeric(length(unique(bit2spor)))
+for (i in 1:length(unique(bit2spor))){
+  freqspor[i]<-sum(ifelse(bit2spor==unique(bit2spor)[i],1,0))}
+freqspor<-freqspor[1:5]
+propbit2spor<-matrix(nrow=length(freqooc),ncol=length(freqspor),data=NA)
+propbit2spor<-as.data.frame(propbit2spor)
+colnames(propbit2spor)[1]<-"sporos0"
+colnames(propbit2spor)[2]<-"sporos1"
+colnames(propbit2spor)[3]<-"sporos2"
+colnames(propbit2spor)[4]<-"sporos3"
+colnames(propbit2spor)[5]<-"sporos4"
+
+propbit2spor[1,1:5]<-c(freqooc[1],0,0,0,0)
+
+for (j in 2:length(freqooc)){
+  for (i in 1:length(freqspor)){
+    propbit2spor[j,i]<-(freqooc[j]*(freqspor[i]/length(bit2spor)))
+  }}
+sum(propbit2spor)
+
+propbit2spor$bit2ooc<-c(unique(bit2ooc))
+
+propbit2spor$sumprob2<-numeric(length(propbit2spor$bit2ooc))
+for (i in 1:length(propbit2spor$bit2ooc)){
+  propbit2spor$sumprob2[i]<-sum(propbit2spor[i,1:5])}
+
+propbit2spor$MBR<-rep("Bite2",length(propbit2spor$bit2ooc))
+colnames(propbit2spor)[6]<-"nooc"
+colnames(propbit2spor)[7]<-"sumprob"
+colnames(propbit1spor)[6]<-"nooc"
+head(propbit2spor)
 
 
 
+bit5ooc<-sort(c(oocContB5,oocATVB5))
+bit5spor<-sort(sporsBites5)
+length(bit5ooc)
+
+##0 - 441 times
+##1 - 13 times
+##2 - 11 times
+##3 - 12 times
+##4 - 1 time
+##5 - 2 times
+##6 - 4 times
+
+freqooc<-numeric(length(unique(bit5ooc)))
+for (i in 1:length(unique(bit5ooc))){ 
+  freqooc[i]<-sum(ifelse(bit5ooc==unique(bit5ooc)[i],1,0))}
+
+freqspor<-numeric(length(unique(bit5spor)))
+for (i in 1:length(unique(bit5spor))){
+  freqspor[i]<-sum(ifelse(bit5spor==unique(bit5spor)[i],1,0))}
+freqspor<-freqspor[1:5]
+propbit5spor<-matrix(nrow=length(freqooc),ncol=length(freqspor),data=NA)
+propbit5spor<-as.data.frame(propbit5spor)
+colnames(propbit5spor)[1]<-"sporos0"
+colnames(propbit5spor)[2]<-"sporos1"
+colnames(propbit5spor)[3]<-"sporos2"
+colnames(propbit5spor)[4]<-"sporos3"
+colnames(propbit5spor)[5]<-"sporos4"
+
+propbit5spor[1,1:5]<-c(freqooc[1],0,0,0,0)
+
+for (j in 2:length(freqooc)){
+  for (i in 1:length(freqspor)){
+    propbit5spor[j,i]<-(freqooc[j]*(freqspor[i]/length(bit5spor)))
+  }}
+sum(propbit5spor)
+
+propbit5spor$bit5ooc<-c(unique(bit5ooc))
+
+propbit5spor$sumprob5<-numeric(length(propbit5spor$bit5ooc))
+for (i in 1:length(propbit5spor$bit5ooc)){
+  propbit5spor$sumprob5[i]<-sum(propbit5spor[i,1:5])}
+
+propbit5spor$MBR<-rep("Bite5",length(propbit5spor$bit5ooc))
+colnames(propbit5spor)[6]<-"nooc"
+colnames(propbit5spor)[7]<-"sumprob"
+
+
+
+bit10ooc<-sort(c(oocATVB10))
+bit10spor<-sort(sporsBites10)
+length(bit10ooc)
+
+##0 - 441 times
+##1 - 13 times
+##2 - 11 times
+##3 - 12 times
+##4 - 1 time
+##5 - 2 times
+##6 - 4 times
+
+freqooc<-numeric(length(unique(bit10ooc)))
+for (i in 1:length(unique(bit10ooc))){ 
+  freqooc[i]<-sum(ifelse(bit10ooc==unique(bit10ooc)[i],1,0))}
+
+freqspor<-numeric(length(unique(bit10spor)))
+for (i in 1:length(unique(bit10spor))){
+  freqspor[i]<-sum(ifelse(bit10spor==unique(bit10spor)[i],1,0))}
+freqspor<-freqspor[1:5]
+propbit10spor<-matrix(nrow=length(freqooc),ncol=length(freqspor),data=NA)
+propbit10spor<-as.data.frame(propbit10spor)
+colnames(propbit10spor)[1]<-"sporos0"
+colnames(propbit10spor)[2]<-"sporos1"
+colnames(propbit10spor)[3]<-"sporos2"
+colnames(propbit10spor)[4]<-"sporos3"
+colnames(propbit10spor)[5]<-"sporos4"
+
+propbit10spor[1,1:5]<-c(freqooc[1],0,0,0,0)
+
+for (j in 2:length(freqooc)){
+  for (i in 1:length(freqspor)){
+    propbit10spor[j,i]<-(freqooc[j]*(freqspor[i]/length(bit10spor)))
+  }}
+sum(propbit10spor)
+
+propbit10spor$bit10ooc<-c(unique(bit10ooc))
+propbit10spor$sumprob10<-numeric(length(propbit10spor$bit10ooc))
+for (i in 1:length(propbit10spor$bit10ooc)){
+  propbit10spor$sumprob10[i]<-sum(propbit10spor[i,1:5])}
+
+
+propbit10spor$MBR<-rep("Bite10",length(propbit10spor$bit10ooc))
+colnames(propbit10spor)[6]<-"nooc"
+colnames(propbit10spor)[7]<-"sumprob"
+head(propbit10spor)
+
+
+require(plotrix)
+require(glmmADMB)
+Alldata<-rbind(propbit1spor,propbit2spor,propbit5spor,propbit10spor)
+dim(Alldata)
+
+sporozoites<-stack(Alldata[,1:5])
+Sporscores<-c(rep(0,length(propbit1spor[,1])),rep(0,length(propbit2spor[,1])),rep(0,length(propbit5spor[,1])),rep(0,length(propbit10spor[,1])),
+              rep(1,length(propbit1spor[,2])),rep(1,length(propbit2spor[,2])),rep(1,length(propbit5spor[,2])),rep(1,length(propbit10spor[,2])),
+              rep(2,length(propbit1spor[,3])),rep(2,length(propbit2spor[,3])),rep(2,length(propbit5spor[,3])),rep(2,length(propbit10spor[,3])),
+              rep(3,length(propbit1spor[,4])),rep(3,length(propbit2spor[,4])),rep(3,length(propbit5spor[,4])),rep(3,length(propbit10spor[,4])),
+              rep(4,length(propbit1spor[,5])),rep(4,length(propbit2spor[,5])),rep(4,length(propbit5spor[,5])), rep(4,length(propbit10spor[,5])))
+                     
+oocysts<-rep(Alldata$nooc,5)
+MBR<-rep(Alldata$MBR,5)
+data<-data.frame(sporozoites,Sporscores,oocysts,MBR)
+head(data)
+data$ooc<-as.factor(data$oocysts)
+data2<-subset(data,oocysts!=0)
+
+
+glm1<-glmmadmb(values~oocysts+(1|MBR), data=data2,zeroInflation=TRUE,family="nbinom")
+
+#datatemp<-subset(data,ind=="sporos1")
+ooc<-unique(data2$oocysts)
+MBRs<-unique(data2$MBR)
+
+dsn1<-expand.grid("MBR"=MBRs)
+dsnb<-subset(dsn1,dsn1$MBRs=="Bite1")
+dsn<-subset(dsn1,dsn1$MBRs!="Bite1")
+
+dsn$eff.i<-NA
+dsn$i.upp<-NA
+dsn$i.low<-NA
+
+for(i in 2:4){
+  
+  temp<-subset(data2,data2$MBR==MBRs[i])
+  tempb1<-subset(data2,data2$MBR=="Bite1")
+  dtemp<-rbind(tempb1,temp)
+  
+  if(length(unique(dtemp$MBR))>1.5){
+    
+    i.glm<-glmmadmb(values~oocysts+(1|MBR), data=dtemp,zeroInflation=TRUE,family="nbinom")
+    dsn$eff.i[i]  <- round((1-exp(coef(i.glm)[2]))  *100,3)
+    i.ci<-confint(i.glm)
+    dsn$i.low[i] <- round((1-exp(i.ci[2,2]))  *100,3)
+    dsn$i.upp[i] <- round((1-exp(i.ci[2,1]))  *100,3)
+    
+  }else{
+    
+    i.glm<-glmmadmb(values~oocysts, data=dtemp,zeroInflation=TRUE,family="nbinom")
+    dsn$eff.i[i]  <- round((1-exp(coef(i.glm)[2]))  *100,3)
+    i.ci<-confint(i.glm)
+    dsn$i.low[i] <- round((1-exp(i.ci[2,2]))  *100,3)
+    dsn$i.upp[i] <- round((1-exp(i.ci[2,1]))  *100,3)
+  }
+}
+
+dsn[1,2:4]<-0
+dsn$cs<-ifelse(dsn$mbr=="Bite1",1,ifelse(dsn$mbr=="Bite2",2,ifelse(dsn$mbr=="Bite5",5,10)))
+plot(dsn$eff.i~dsn$cs,pch=16,cex=1.25,col="chartreuse4",
+     bty="n",main="GLMM estimation",las=1,
+     ylim=c(0,2),xlim=c(0,10),
+     xlab="Number of oocysts",ylab="Sporozoites",axes=F)
+axis(side=1,at=seq(from=0,to=200,by=20),labels=seq(from=0,to=200,by=20))
+axis(side=2,at=seq(0,2,0.5),las=2)
+points(dsn$eff.i~dsn$oocysts,pch=16,cex=1.5,col="chartreuse4")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dataperbite<-matrix(nrow=4,ncol=length(propbit1spor$sumprob))
+for(i in 1:length(propbit1spor$sumprob)){
+  dataperbite[,i]<-c(propbit1spor$sumprob[i],propbit2spor$sumprob2[i],propbit5spor$sumprob5[i],propbit10spor$sumprob10[i])}
+
+plot(dataperbite[1,2:55]~propbit1spor$bit1ooc[2:55],pch=20)
+lower<-upper<-numeric(length(54));
+for (i in 2:55){
+  lower[i]<-min(dataperbite[1:4,i])
+  upper[i]<-max(dataperbite[1:4,i])}
+polygon(c(propbit1spor$bit1ooc, rev(propbit1spor$bit1ooc)),c(lower,rev(upper)),border=NA, col="chartreuse4")
+
+plot(propbit1spor$bit1ooc,propbit1spor$sporos0,ylim=c(0,0.01),ylab="Probability of sporozoites")
+points(propbit1spor$bit1ooc,propbit1spor$sporos1,pch=19)
+points(propbit1spor$bit1ooc,propbit1spor$sporos2,pch=19,col="blue")
+points(propbit1spor$bit1ooc,propbit1spor$sporos3,pch=19,col="chartreuse")
+points(propbit1spor$bit1ooc,propbit1spor$sporos4,pch=19,col="chocolate")
+par(mfrow=c(2,3))
+colnames <- dimnames(propbit10spor)[[2]]
+for (i in 1:5) {
+  plot(propbit1spor[,i]~propbit1spor$bit1ooc,
+       main=colnames[i], 
+       col="red", pch=19,
+       ylim=c(0,0.01),xlim=c(0,100),
+       xlab="Proportion of sporozoite counts")
+  points(propbit2spor[,i]~propbit2spor$bit2ooc,pch=19,col="orange")
+  points(propbit5spor[,i]~propbit5spor$bit5ooc,pch=19,col="yellow")
+  points(propbit10spor[,i]~propbit10spor$bit10ooc,pch=19,col="green")
+  lines(propbit1spor[,i]~propbit1spor$bit1ooc,col="red",lty=1)
+  lines(propbit2spor[,i]~propbit2spor$bit2ooc,col="orange",lty=1)
+  lines(propbit5spor[,i]~propbit5spor$bit5ooc,col="yellow",lty=1)
+  lines(propbit10spor[,i]~propbit10spor$bit10ooc,col="green",lty=1)
+}
+
+#Nstim=propbit1spor$sporo0
+#geometric.loglikelihood <- function(p.vec) {
+#  a<-p.vec[1]
+#  b<-p.vec[2]
+#  c<-p.vec[3]
+ 
+#  pred1<- (a * exp (b * exp(c *  propbit1spor$bit1ooc)))
+#  data1<- propbit1spor[,1]/sum(propbit1spor[,1])
+#  data2<- propbit1spor[,2]/sum(propbit1spor[,2])
+#  data3<- propbit1spor[,3]/sum(propbit1spor[,3])
+#  data4<- propbit1spor[,4]/sum(propbit1spor[,4])
+#  data5<- propbit1spor[,5]/sum(propbit1spor[,5])
+  
+#  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+#  loglik2<- data2* log((pred1)+0.00001)+(1-data2)*log(1-((pred1)-0.00001))
+#  loglik3<- data3* log((pred1)+0.00001)+(1-data3)*log(1-((pred1)-0.00001))
+#  loglik4<- data4* log((pred1)+0.00001)+(1-data4)*log(1-((pred1)-0.00001))
+#  loglik5<- data5* log((pred1)+0.00001)+(1-data5)*log(1-((pred1)-0.00001))
+  
+#  -sum(loglik1,loglik2,loglik3,loglik4,loglik5,na.rm=T) 
+#}
+### optimise the likelihood function
+#test<-optim(c(0.5,0,0.8),geometric.loglikelihood,method="L-BFGS-B",lower=c(0,-10,-10),upper=c(0.99,10,10))
+
+#x1<-seq(0,100,1)
+#predbit1<-(test$par[1] * exp (test$par[2] * exp(test$par[3] *  x1)))
+#plot(predbit1~x1)
+
+##Try and fit the probability of 0 - 4 sporozoite scores 
+##given n oocyst for the different biting rates
+##
+
+mod_base <- function(params){
+  n        <- params[1] ##mean of the negbin probability function to be estimated
+  sig_n    <- params[2] ##sd of the distribution of sporozoites probabilities
+  mu       <- params[3] ##mean number of oocysts (gamma distribution)
+  sig_mu   <- params[4] ##sd of oocysts (gamma distribution)
+  SPRE       <- params[5] ##probability that a sporozoite is recovered
+  
+  ############################
+  ## Secondary NegBin parameters
+  
+  p = (sig_n^2-n)/(sig_n^2)
+  r = (n^2)/(sig_n^2-n)
+  
+  ############################
+  ## Secondary Gamma parameters
+  
+  theta_g <- sig_mu*sig_mu/mu
+  
+  ##############################
+  ## Sporozoites
+  
+  prop1 <- propbit1spor[,1]/sum(propbit1spor[,1])
+  prop2 <- propbit1spor[,2]/sum(propbit1spor[,2])
+  prop3 <- propbit1spor[,3]/sum(propbit1spor[,3])
+  prop4 <- propbit1spor[,4]/sum(propbit1spor[,4])
+  prop5 <- propbit1spor[,5]/sum(propbit1spor[,5])
+  
+  p_spz1 = n*prop1/(n*prop1 + r)
+  p_spz2 = n*prop1/(n*prop1 + r)
+  p_spz3 = n*prop1/(n*prop1 + r)
+  p_spz4 = n*prop1/(n*prop1 + r)
+  p_spz5 = n*prop1/(n*prop1 + r)
+  
+  II <- 1:1000
+  
+  
+  logL1 <- logL2 <- logL3 <- logL4 <- logL5 <- 0
+  for(j in 1:length(propbit1spor$bit1ooc)){
+    if( propbit1spor$bit1ooc[j]>0 ){
+      coeffs1 <- lgamma(II+r) - lgamma(II+1) - lgamma(r) + r*log(1-p_spz1[j]) + II*log(p_spz1[j])
+      coeffs2 <- lgamma(II+r) - lgamma(II+1) - lgamma(r) + r*log(1-p_spz1[j]) + II*log(p_spz1[j])
+      coeffs3 <- lgamma(II+r) - lgamma(II+1) - lgamma(r) + r*log(1-p_spz1[j]) + II*log(p_spz1[j])
+      coeffs4 <- lgamma(II+r) - lgamma(II+1) - lgamma(r) + r*log(1-p_spz1[j]) + II*log(p_spz1[j])
+      coeffs5 <- lgamma(II+r) - lgamma(II+1) - lgamma(r) + r*log(1-p_spz1[j]) + II*log(p_spz1[j])
+      
+      coeffs1 <- exp(coeffs1)
+      coeffs2 <- exp(coeffs2)
+      coeffs3 <- exp(coeffs3)
+      coeffs4 <- exp(coeffs4)
+      coeffs5 <- exp(coeffs5)
+      
+      logL1 <- logL1 + log(sum( coeffs1*dgamma(propbit1spor$bit1ooc[j], shape=mu*II/theta_g, scale=theta_g) ))
+      logL2 <- logL2 + log(sum( coeffs1*dgamma(propbit1spor$bit1ooc[j], shape=mu*II/theta_g, scale=theta_g) ))
+      logL3 <- logL3 + log(sum( coeffs1*dgamma(propbit1spor$bit1ooc[j], shape=mu*II/theta_g, scale=theta_g) ))
+      logL4 <- logL4 + log(sum( coeffs1*dgamma(propbit1spor$bit1ooc[j], shape=mu*II/theta_g, scale=theta_g) ))
+      logL5 <- logL5 + log(sum( coeffs1*dgamma(propbit1spor$bit1ooc[j], shape=mu*II/theta_g, scale=theta_g) ))
+    }
+    if( propbit1spor$bit1ooc[j]==0 ){
+      logL1 <- logL1 + r*log(1-p_spz1[j])
+      logL2 <- logL2 + r*log(1-p_spz1[j])
+      logL3 <- logL3 + r*log(1-p_spz1[j])
+      logL4 <- logL4 + r*log(1-p_spz1[j])
+      logL5 <- logL5 + r*log(1-p_spz1[j])
+    }
+  }
+  
+  -sum(logL1,logL2,logL3,logL4,logL5,na.rm=T)
+}
+############################
+## Define limits for parameters and perform 
+## MLE model fitting
+
+temp_mat <- matrix(NA, nrow=2, ncol=6)
+
+lower <- c(10,  10,  200,   200,   0)
+upper <- c(1000,1000,20000, 10000, 1)
+
+ui <- rbind( diag(5), c(0,0,0,0,-1) )
+ci <- c(lower, -1)
+
+theta <- randomLHS(2,5)
+theta <- t( lower +  t(theta)*(0.25*upper-lower) )
+
+
+max_MLE <- 1e6
+par_MLE <- rep(NA, 5)
+
+
+for(j in 1:2){
+  MLE_base <- constrOptim(theta=theta[j,], f=mod_base, grad=NULL, ui=ui, ci=ci,
+                          outer.iterations = 100, outer.eps = 1e-06)
+  
+  temp_mat[j,1:5] <- MLE_base$par
+  temp_mat[j,6]   <- -MLE_base$value
+  
+  if( MLE_base$value < max_MLE ){ 
+    max_MLE <- -MLE_base$value
+    best_MLE_base <- MLE_base 			
+  }	
+}
+
+
+
+n_mle      <- best_MLE_base$par[1]
+sig_n_mle  <- best_MLE_base$par[2]
+mu_mle     <- best_MLE_base$par[3]
+sig_mu_mle <- best_MLE_base$par[4]
+VE_mle     <- best_MLE_base$par[5]
+
+p_mle <- (sig_n_mle^2-n_mle)/(sig_n_mle^2)
+r_mle <- (n_mle^2)/(sig_n_mle^2-n_mle) 
+
+n_mle;sig_n_mle;mu_mle;sig_mu_mle;VE_mle
 
 ######
 #######Try in Rstan
