@@ -43,7 +43,7 @@ oocU<-c(0,bo1[2],bo2[2],bo3[2],bo4[2],bo5[2])
 OZFER<-subset(oocysts,Treatment=="OZFER")
 OZFER$oocprevfer<-ifelse(OZFER$oocysts==0,0,1)
 sum(OZFER$oocprevfer)/length(OZFER$oocprevfer)
-
+mean(OZFER$oocysts)
 oocdataD1FER<-sort(OZFER$oocysts[OZFER$oocysts > 0])
 length(oocdataD1FER)/5
 
@@ -69,7 +69,7 @@ oocFERU<-c(0,bo1[2],bo2[2],bo3[2],bo4[2],bo5[2])
 OZDSM<-subset(oocysts,Treatment=="OZDSM")
 OZDSM$oocprevdsm<-ifelse(OZDSM$oocysts==0,0,1)
 sum(OZDSM$oocprevdsm)/length(OZDSM$oocprevdsm)
-
+mean(OZDSM$oocysts)
 oocdataD1DSM<-sort(OZDSM$oocysts[OZDSM$oocysts > 0])
 length(oocdataD1DSM)/5
 
@@ -96,7 +96,7 @@ oocDSMU<-c(0,bo1[2],bo2[2],bo3[2],bo4[2],bo5[2])
 OZPIP<-subset(oocysts,Treatment=="OZPIP")
 OZPIP$oocprevpip<-ifelse(OZPIP$oocysts==0,0,1)
 sum(OZPIP$oocprevpip)/length(OZPIP$oocprevpip)
-
+mean(OZPIP$oocysts)
 oocdataD1PIP<-sort(OZPIP$oocysts[OZPIP$oocysts > 0])
 length(oocdataD1PIP)/5
 
@@ -123,7 +123,7 @@ oocPIPU<-c(0,bo1[2],bo2[2],bo3[2],bo4[2],bo5[2])
 UCT<-subset(oocysts,Treatment=="UCT")
 UCT$oocprevuct<-ifelse(UCT$oocysts==0,0,1)
 sum(UCT$oocprevuct)/length(UCT$oocprevuct)
-
+mean(UCT$oocysts)
 oocdataD1UCT<-sort(UCT$oocysts[UCT$oocysts > 0])
 length(oocdataD1UCT)/5
 
@@ -960,4 +960,16 @@ lines(seq(0,X1,1),ATVfitooc2,col="chocolate")
 
 
 
+#################################
+#################################
+## And using the mean gompertz sporoscores approach...
+  a=0.7945516
+  b=-8.3516861
+  c=-0.4617241
+  alpha=-6.618501 
+  beta=6.021603
+  nc<-seq(0,100,1)
+spsc<-a * exp (b * exp(c * nc))
+PREDcon<-(exp(alpha + beta * spsc)) / (1 + exp(alpha + beta * spsc))
 
+plot(PREDcon~nc,log="x")

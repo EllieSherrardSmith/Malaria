@@ -30,6 +30,8 @@ oocContB5<-c(oocysts2$Oocyst[oocysts2$Bites==5])
 #sporsB5<-c(spors$Sporozoite1[spors$Treatment=="Blank" & spors$Bites==5],spors$Sporozoite2[spors$Treatment=="Blank" & spors$Bites==5])
 #sporsB10<-c(spors$Sporozoite1[spors$Treatment=="Blank" & spors$Bites==10],spors$Sporozoite2[spors$Treatment=="Blank" & spors$Bites==10])
 
+
+###Sporozoites
 sporosALL<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\Mouse Data All\\ParasiteAllMASTER5.txt",header=T)
 sporsBites1<-c(sporosALL$Sporozoite1[sporosALL$Mosies==1])
 sporsBites2<-c(sporosALL$Sporozoite1[sporosALL$Mosies==2],sporosALL$Sporozoite2[sporosALL$Mosies==2])
@@ -64,7 +66,19 @@ SPORtab2<-data.frame(scores,bites,group)
 
 sportab<-cast(SPORtab2, group ~ scores, mean, value = 'bites')
 
+#####Parasitemia
+sporosALL$paraprev<-NA
+  for (i in 1:length(sporosALL[,1])){
+    sporosALL$paraprev[i]<-ifelse(sum(sporosALL[i,14:20],na.rm=T)>0,1,0)}
+sporosALL$paraprev
+paraBites1<-c(sporosALL$paraprev[sporosALL$Mosies==1])
+paraBites2<-c(sporosALL$paraprev[sporosALL$Mosies==2])
+paraBites5<-c(sporosALL$paraprev[sporosALL$Mosies==5])
+paraBites10<-c(sporosALL$paraprev[sporosALL$Mosies==10])
+paras<-c(0,sum(paraBites1)/length(paraBites1),sum(paraBites2)/length(paraBites2),sum(paraBites5)/length(paraBites5),sum(paraBites10)/length(paraBites10))
 
+
+###Oocysts
 meanooc<-c(rep(0,100),rep(mean(c(oocContB1,oocATVB1)),length(sporsBites1)),
             rep(mean(c(oocContB2,oocATVB2)),length(sporsBites2[sporsBites2<5])),
             rep(mean(c(oocContB5,oocATVB5)),length(sporsBites5)),
@@ -79,6 +93,8 @@ head(countdata)
 plot(sporscores~meanooc)
 ##spor score distribution is negbin
 meanooc2<-c(unique(meanooc))
+medianooc<-c(0,median(c(oocContB1,oocATVB1)),median(c(oocContB2,oocATVB2)),
+             median(c(oocContB5,oocATVB5)),median(oocATVB10))
 meanspor<-c(0,mean(sporsBites1),mean(sporsBites2[sporsBites2<5]),mean(sporsBites5),mean(sporsBites10))
 
 library(beanplot)
@@ -126,7 +142,9 @@ gommod
 nc<-seq(0,40,1)
 
 pred2<-   gommod$par[1] * exp (gommod$par[2] * exp(gommod$par[3] * nc))
-plot(meanspor~meanooc2)
+plot(meanspor~meanooc2,
+     ylab="Mean sporozoite score per mosquito biting rate (MBR)",xlab="Mean oocyst count per MBR",
+     cex.lab=1.4,cex=1.2)
 lines(nc,pred2,col="yellow",lwd=2)
 
 #####
@@ -219,6 +237,109 @@ axis(1,at=seq(from=0, to=30,1),labels=seq(0,30,1))
 polygon(c(nc, rev(nc)),c(pred2upper,rev(pred2lower)),border=NA, col="chartreuse4")
 lines(nc,pred2,col="yellow",lwd=2)
 points(meanspor~meanooc2,col="chocolate2",pch=16)
+
+#############################################
+####
+#####
+###### Try fitting mean oocysts to mean prevalence for each mouse populations 
+#####
+####
+######################################
+plot(meanooc2,paras)
+
+log.binom2<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * meanooc2)) / (1 + exp(a + b * meanooc2)) ) 
+  prev1<-paras  
+  loglik1a<- prev1* log((pred1a)+0.0000001)+(1-prev1)*log(1-((pred1a)-0.0000001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+
+nc<-seq(0,150,1)
+logmod2<-optim(c(0,0),log.binom2,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod2
+pred<-((exp(logmod2$par[1] + logmod2$par[2] * nc)) / (1 + exp(logmod2$par[1] + logmod2$par[2] * nc)) ) 
+lines(pred~nc)
+
+gom.binom2<-function(p.vec){
+  a<-p.vec[1]
+  b<-p.vec[2]
+  c<-p.vec[3]
+  
+  pred1<- (a * exp (b * exp(c *  meanooc2)))
+  data1<- paras 
+  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-3
+gommod2<-optim(c(0.75,-2,-0.5),gom.binom2,method="L-BFGS-B",lower=c(0.5,-10,-5),upper=c(0.99,-1,-0.0001))
+gommod2
+
+pred2g<-   gommod2$par[1] * exp (gommod2$par[2] * exp(gommod2$par[3] * nc))
+lines(pred2g~nc)
+
+#
+## CIs for estimates from gompertz model
+#
+
+optim.model2<-gom.binom2(gommod2$par)
+
+size.of.grid<-100
+a.range<-seq(0.5,0.9,length=size.of.grid)
+b.range<-seq(-7,-3,length=size.of.grid)
+c.range<-seq(-0.5,-0.01,length=size.of.grid)
+
+pds2<-expand.grid("a"=a.range,"b"=b.range,"c"=c.range)
+pds2$modcom<-NA
+
+for(i in 1:length(pds2$a)){
+  p.vec<-c(pds2$a[i],pds2$b[i],pds2$c[i])
+  ci.n.param<-length(p.vec) 
+  ci.fit<-gom.binom2(p.vec)     
+  pds2$modcom[i]<-ifelse(1-pchisq(2*(max(ci.fit,optim.model2)-min(ci.fit,optim.model2)),1) < 0.05,"discard","keep")
+  #print(i)
+}
+pds2.new<-subset(pds2,pds2$modcom=="keep")
+
+length(pds2$a)
+length(pds2.new$a)
+max(pds2.new$a)
+min(pds2.new$a)
+max(pds2.new$b)
+min(pds2.new$b)
+max(pds2.new$c)
+min(pds2.new$c)
+
+#
+##
+
+q1a2<-quantile(pds2.new$a,0.025)##0.5080808
+q2a2<-quantile(pds2.new$a,0.975)##0.8919192
+q1b2<-quantile(pds2.new$b,0.025)##-6.919192 
+q2b2<-quantile(pds2.new$b,0.975)##-3.080808
+q1c2<-quantile(pds2.new$c,0.025)##-0.490101
+q2c2<-quantile(pds2.new$c,0.975)##-0.05949495
+
+
+pred2lower2<-   q1a2 * exp (q1b2 * exp(q2c2 * nc))
+pred2upper2<-   q2a2 * exp (q2b2 * exp(q1c2 * nc))
+
+
+pred2lower2<-   0.5080808 * exp (-6.919192 * exp(-0.05949495 * nc))
+pred2upper2<-   0.8919192 * exp (-3.080808 * exp(-0.490101 * nc))
+
+plot(meanooc2,paras,
+     ylim=c(0,1),ylab="Prevalence in mouse population",
+     xlim=c(0,10))
+lines(pred2g~nc)
+lines(pred2upper2~nc)
+lines(pred2lower2~nc)
+
+
 #############################################
 ##
 ###Try probability
