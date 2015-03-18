@@ -1,10 +1,10 @@
 library(reshape)
 oocysts<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\UCT OZPIP FER DSM Feb2015\\M2M SporozoiteScores\\OocystIntensity.txt",header=TRUE)
-blanks<-subset(oocysts,Treatment=="Blank")
-OZFER<-subset(oocysts,Treatment=="OZFER")
-OZDSM<-subset(oocysts,Treatment=="OZDSM")
-OZPIP<-subset(oocysts,Treatment=="OZPIP")
-UCT<-subset(oocysts,Treatment=="UCT")
+blanks<-subset(oocysts,Treatment=="Blank");mean(blanks$oocysts)
+OZFER<-subset(oocysts,Treatment=="OZFER");mean(OZFER$oocysts)
+OZDSM<-subset(oocysts,Treatment=="OZDSM");mean(OZDSM$oocysts)
+OZPIP<-subset(oocysts,Treatment=="OZPIP");mean(OZPIP$oocysts)
+UCT<-subset(oocysts,Treatment=="UCT");mean(UCT$oocysts)
 
 oocATV<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\ATV25\\mosquito.txt",header=TRUE)
 summary(oocATV)
@@ -16,6 +16,7 @@ oocATVB10<-c(oocATV$Oocyst[oocATV$Bites==10]);mean(oocATVB10)
 
 OOC<-c(blanks$oocysts,OZFER$oocysts,OZDSM$oocysts,OZPIP$oocysts,UCT$oocysts,oocATV$Oocyst)
 
+mean(oocATVB10)
 
 oocysts2<-read.table("C:\\Users\\Ellie\\Documents\\Data Malaria\\ATV50 and Controls\\atv50_mosquito_final_data_missing10.txt",header=T)
 head(oocysts2)
@@ -380,7 +381,6 @@ for (i in 1:length(freqspor)){
 propbit1spor[j,i]<-(freqooc[j]*(freqspor[i]/length(bit1spor)))
 }}
 sum(propbit1spor[1,])
-head(propbit1spor)
 
 propbit1spor$bit1ooc<-c(unique(bit1ooc))
 
@@ -390,17 +390,18 @@ propbit1spor$sumprob[i]<-sum(propbit1spor[i,1:5])}
 
 propbit1spor$MBR<-rep("Bite1",length(propbit1spor$bit1ooc))
 
+propbit1spor$sporf0<-propbit1spor$sporos0/(length(bit1ooc)-freqooc[1]);propbit1spor$sporf0[1]<-NA
+propbit1spor$sporf1<-propbit1spor$sporos1/(length(bit1ooc)-freqooc[1])
+propbit1spor$sporf2<-propbit1spor$sporos2/(length(bit1ooc)-freqooc[1])
+propbit1spor$sporf3<-propbit1spor$sporos3/(length(bit1ooc)-freqooc[1])
+propbit1spor$sporf4<-propbit1spor$sporos4/(length(bit1ooc)-freqooc[1])
+head(propbit1spor)
+
+
+
 bit2ooc<-sort(c(oocContB2,oocATVB2))
 bit2spor<-sort(sporsBites2)
 length(bit2ooc)
-
-##0 - 441 times
-##1 - 13 times
-##2 - 11 times
-##3 - 12 times
-##4 - 1 time
-##5 - 2 times
-##6 - 4 times
 
 freqooc<-numeric(length(unique(bit2ooc)))
 for (i in 1:length(unique(bit2ooc))){ 
@@ -436,6 +437,12 @@ propbit2spor$MBR<-rep("Bite2",length(propbit2spor$bit2ooc))
 colnames(propbit2spor)[6]<-"nooc"
 colnames(propbit2spor)[7]<-"sumprob"
 colnames(propbit1spor)[6]<-"nooc"
+
+propbit2spor$sporf0<-propbit2spor$sporos0/(length(bit2ooc)-freqooc[1]);propbit2spor$sporf0[1]<-NA
+propbit2spor$sporf1<-propbit2spor$sporos1/(length(bit2ooc)-freqooc[1])
+propbit2spor$sporf2<-propbit2spor$sporos2/(length(bit2ooc)-freqooc[1])
+propbit2spor$sporf3<-propbit2spor$sporos3/(length(bit2ooc)-freqooc[1])
+propbit2spor$sporf4<-propbit2spor$sporos4/(length(bit2ooc)-freqooc[1])
 head(propbit2spor)
 
 
@@ -443,14 +450,6 @@ head(propbit2spor)
 bit5ooc<-sort(c(oocContB5,oocATVB5))
 bit5spor<-sort(sporsBites5)
 length(bit5ooc)
-
-##0 - 441 times
-##1 - 13 times
-##2 - 11 times
-##3 - 12 times
-##4 - 1 time
-##5 - 2 times
-##6 - 4 times
 
 freqooc<-numeric(length(unique(bit5ooc)))
 for (i in 1:length(unique(bit5ooc))){ 
@@ -486,19 +485,17 @@ propbit5spor$MBR<-rep("Bite5",length(propbit5spor$bit5ooc))
 colnames(propbit5spor)[6]<-"nooc"
 colnames(propbit5spor)[7]<-"sumprob"
 
+propbit5spor$sporf0<-propbit5spor$sporos0/(length(bit5ooc)-freqooc[1]);propbit5spor$sporf0[1]<-NA
+propbit5spor$sporf1<-propbit5spor$sporos1/(length(bit5ooc)-freqooc[1])
+propbit5spor$sporf2<-propbit5spor$sporos2/(length(bit5ooc)-freqooc[1])
+propbit5spor$sporf3<-propbit5spor$sporos3/(length(bit5ooc)-freqooc[1])
+propbit5spor$sporf4<-propbit5spor$sporos4/(length(bit5ooc)-freqooc[1])
+head(propbit5spor)
 
 
 bit10ooc<-sort(c(oocATVB10))
 bit10spor<-sort(sporsBites10)
 length(bit10ooc)
-
-##0 - 441 times
-##1 - 13 times
-##2 - 11 times
-##3 - 12 times
-##4 - 1 time
-##5 - 2 times
-##6 - 4 times
 
 freqooc<-numeric(length(unique(bit10ooc)))
 for (i in 1:length(unique(bit10ooc))){ 
@@ -530,9 +527,15 @@ for (i in 1:length(propbit10spor$bit10ooc)){
   propbit10spor$sumprob10[i]<-sum(propbit10spor[i,1:5])}
 
 
-propbit10spor$MBR<-rep("Bite10",length(propbit10spor$bit10ooc))
+propbit10spor$MBR<-rep("Bites10",length(propbit10spor$bit10ooc))
 colnames(propbit10spor)[6]<-"nooc"
 colnames(propbit10spor)[7]<-"sumprob"
+
+propbit10spor$sporf0<-propbit10spor$sporos0/(length(bit10ooc)-freqooc[1]);propbit10spor$sporf0[1]<-NA
+propbit10spor$sporf1<-propbit10spor$sporos1/(length(bit10ooc)-freqooc[1])
+propbit10spor$sporf2<-propbit10spor$sporos2/(length(bit10ooc)-freqooc[1])
+propbit10spor$sporf3<-propbit10spor$sporos3/(length(bit10ooc)-freqooc[1])
+propbit10spor$sporf4<-propbit10spor$sporos4/(length(bit10ooc)-freqooc[1])
 head(propbit10spor)
 
 
@@ -542,6 +545,7 @@ Alldata<-rbind(propbit1spor,propbit2spor,propbit5spor,propbit10spor)
 dim(Alldata)
 
 sporozoites<-stack(Alldata[,1:5])
+sporprobs<-stack(Alldata[,9:13])
 Sporscores<-c(rep(0,length(propbit1spor[,1])),rep(0,length(propbit2spor[,1])),rep(0,length(propbit5spor[,1])),rep(0,length(propbit10spor[,1])),
               rep(1,length(propbit1spor[,2])),rep(1,length(propbit2spor[,2])),rep(1,length(propbit5spor[,2])),rep(1,length(propbit10spor[,2])),
               rep(2,length(propbit1spor[,3])),rep(2,length(propbit2spor[,3])),rep(2,length(propbit5spor[,3])),rep(2,length(propbit10spor[,3])),
@@ -550,75 +554,337 @@ Sporscores<-c(rep(0,length(propbit1spor[,1])),rep(0,length(propbit2spor[,1])),re
                      
 oocysts<-rep(Alldata$nooc,5)
 MBR<-rep(Alldata$MBR,5)
-data<-data.frame(sporozoites,Sporscores,oocysts,MBR)
+data<-data.frame(sporozoites,sporprobs,Sporscores,oocysts,MBR)
+data[301:320,]
+colnames(data)[1]<-"sporozoites"
+colnames(data)[3]<-"sporprobs"
+data$roundspors<-round(data$sporozoites)
 head(data)
-data$ooc<-as.factor(data$oocysts)
 data2<-subset(data,oocysts!=0)
+ 
+plot(data2$sporprobs[data2$MBR=="Bite1"]~data2$oocysts[data2$MBR=="Bite1"])
 
 
-glm1<-glmmadmb(values~oocysts+(1|MBR), data=data2,zeroInflation=TRUE,family="nbinom")
+glm1<-glmmadmb(cbind(roundspors,547)~oocysts+(1|MBR), data=data,zeroInflation=TRUE,family="nbinom")
 
 #datatemp<-subset(data,ind=="sporos1")
-ooc<-unique(data2$oocysts)
-MBRs<-unique(data2$MBR)
+
+MBRs<-unique(data$MBR)
 
 dsn1<-expand.grid("MBR"=MBRs)
-dsnb<-subset(dsn1,dsn1$MBRs=="Bite1")
-dsn<-subset(dsn1,dsn1$MBRs!="Bite1")
+dsnb<-subset(dsn1,dsn1$MBR=="Bite1")
+dsn<-subset(dsn1,dsn1$MBR!="Bite1")
 
-dsn$eff.i<-NA
-dsn$i.upp<-NA
-dsn$i.low<-NA
+dsn1$eff.i<-NA
+dsn1$i.upp<-NA
+dsn1$i.low<-NA
 
-for(i in 2:4){
+for(i in 1:4){
   
-  temp<-subset(data2,data2$MBR==MBRs[i])
-  tempb1<-subset(data2,data2$MBR=="Bite1")
+  temp<-subset(data,data$MBR==MBRs[i])
+  tempb1<-subset(data,data$MBR=="Bite1")
   dtemp<-rbind(tempb1,temp)
   
   if(length(unique(dtemp$MBR))>1.5){
     
-    i.glm<-glmmadmb(values~oocysts+(1|MBR), data=dtemp,zeroInflation=TRUE,family="nbinom")
-    dsn$eff.i[i]  <- round((1-exp(coef(i.glm)[2]))  *100,3)
+    i.glm<-glmmadmb(cbind(roundspors,547)~oocysts+(1|MBR), data=dtemp,zeroInflation=TRUE,family="nbinom")
+    dsn1$eff.i[i]  <- round((1-exp(coef(i.glm)[2]))  *100,3)
     i.ci<-confint(i.glm)
-    dsn$i.low[i] <- round((1-exp(i.ci[2,2]))  *100,3)
-    dsn$i.upp[i] <- round((1-exp(i.ci[2,1]))  *100,3)
+    dsn1$i.low[i] <- round((1-exp(i.ci[2,2]))  *100,3)
+    dsn1$i.upp[i] <- round((1-exp(i.ci[2,1]))  *100,3)
     
   }else{
     
-    i.glm<-glmmadmb(values~oocysts, data=dtemp,zeroInflation=TRUE,family="nbinom")
-    dsn$eff.i[i]  <- round((1-exp(coef(i.glm)[2]))  *100,3)
+    i.glm<-glmmadmb(cbind(roundspors,547)~oocysts, data=dtemp,zeroInflation=TRUE,family="nbinom")
+    dsn1$eff.i[i]  <- round((1-exp(coef(i.glm)[2]))  *100,3)
     i.ci<-confint(i.glm)
-    dsn$i.low[i] <- round((1-exp(i.ci[2,2]))  *100,3)
-    dsn$i.upp[i] <- round((1-exp(i.ci[2,1]))  *100,3)
+    dsn1$i.low[i] <- round((1-exp(i.ci[2,2]))  *100,3)
+    dsn1$i.upp[i] <- round((1-exp(i.ci[2,1]))  *100,3)
   }
 }
 
-dsn[1,2:4]<-0
-dsn$cs<-ifelse(dsn$mbr=="Bite1",1,ifelse(dsn$mbr=="Bite2",2,ifelse(dsn$mbr=="Bite5",5,10)))
-plot(dsn$eff.i~dsn$cs,pch=16,cex=1.25,col="chartreuse4",
+dsn1$meanooc2<-ifelse(dsn1$MBR=="Bite1",7.404022,ifelse(dsn1$MBR=="Bite2",13.878788,ifelse(dsn1$MBR=="Bite5",17.435662,30.393333)))
+dsn1
+
+dsn0<-expand.grid("MBR"=0)
+dsn0$eff.i<-dsn0$i.upp<-dsn0$i.low<-dsn0$meanooc2<-0
+dsn<-rbind(dsn0,dsn1)
+
+plot(dsn$eff.i~dsn$meanooc2,pch=16,cex=1.25,col="chartreuse4",
      bty="n",main="GLMM estimation",las=1,
-     ylim=c(0,2),xlim=c(0,10),
-     xlab="Number of oocysts",ylab="Sporozoites",axes=F)
-axis(side=1,at=seq(from=0,to=200,by=20),labels=seq(from=0,to=200,by=20))
+     ylim=c(0,2),xlim=c(0,36),
+     xlab="Number of Oocysts",ylab="Sporozoite score",axes=F)
+axis(side=1,at=seq(from=0,to=36,by=1),labels=seq(from=0,to=36,by=1))
 axis(side=2,at=seq(0,2,0.5),las=2)
-points(dsn$eff.i~dsn$oocysts,pch=16,cex=1.5,col="chartreuse4")
 
 
+gom.binom2<-function(p.vec){
+  a<-p.vec[1]
+  b<-p.vec[2]
+  c<-p.vec[3]
+  
+  pred1<- (a * exp (b * exp(c *  dsn$meanooc2)))
+  data1<- dsn$eff.i 
+  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-3
+gommod2<-optim(c(0.75,-2,-0.5),gom.binom2,method="L-BFGS-B",lower=c(0.5,-10,-5),upper=c(0.99,-0.1,-0.0001))
+gommod2
+
+pred2g<-   gommod2$par[1] * exp (gommod2$par[2] * exp(gommod2$par[3] * nc))
+lines(pred2g~nc)
+
+gom.binom2l<-function(p.vec){
+  a<-p.vec[1]
+  b<-p.vec[2]
+  c<-p.vec[3]
+  
+  pred1<- (a * exp (b * exp(c *  dsn$meanooc2)))
+  data1<- dsn$i.low 
+  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-3
+gommod2l<-optim(c(0.75,-2,-0.5),gom.binom2l,method="L-BFGS-B",lower=c(0.5,-10,-5),upper=c(0.99,-0.1,-0.0001))
+gommod2l
+
+pred2gl<-   gommod2l$par[1] * exp (gommod2l$par[2] * exp(gommod2l$par[3] * nc))
+lines(pred2gl~nc)
+
+gom.binom2u<-function(p.vec){
+  a<-p.vec[1]
+  b<-p.vec[2]
+  c<-p.vec[3]
+  
+  pred1<- (a * exp (b * exp(c *  dsn$meanooc2)))
+  data1<- dsn$i.upp 
+  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-3
+gommod2u<-optim(c(0.75,-2,-0.5),gom.binom2u,method="L-BFGS-B",lower=c(0.5,-10,-0.48),upper=c(0.95,-0.1,-0.46))
+gommod2u
+
+pred2gu<-   gommod2u$par[1] * exp (gommod2u$par[2] * exp(gommod2u$par[3] * nc))*1.4
+lines(pred2gu~nc)
+
+polygon(c(nc, rev(nc)),c(pred2gu,rev(pred2gl)),border=NA, col="aquamarine1")
+lines(pred2g~nc)
+arrows(1,pred2gl[2],1,pred2gu[2],length=0,col="chocolate4",lty=3)
+arrows(dsn$meanooc2[2],dsn$i.low[2],dsn$meanooc2[2],dsn$i.upp[2],length=0,col="chocolate4",lty=3)
+arrows(dsn$meanooc2[3],dsn$i.low[3],dsn$meanooc2[3],dsn$i.upp[3],length=0,col="chocolate4",lty=3)
+arrows(dsn$meanooc2[4],dsn$i.low[4],dsn$meanooc2[4],dsn$i.upp[4],length=0,col="chocolate4",lty=3)
+arrows(dsn$meanooc2[5],dsn$i.low[5],dsn$meanooc2[5],dsn$i.upp[5],length=0,col="chocolate4",lty=3)
+
+points(dsn$eff.i~dsn$meanooc2,pch=16,cex=1.5,col="chocolate4")
+
+##################################################################
+##################################################################
+
+data2$correctedprob<-data2$sporprobs/sum(data2$sporprobs)
+head(data2)
+plot(data2$correctedprob~data2$oocysts)
+
+##prevalence of sporozoites per oocyst per MBR
+##number != sporos0 / total at a given biting rate for 1 oocyst 
+a1<-sum(data2$sporozoites[data2$ind!="sporos0" & data2$oocysts==1 & data2$MBR=="Bite1"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite1"])
+a2<-sum(data2$sporozoites[data2$ind!="sporos0" & data2$oocysts==1 & data2$MBR=="Bite2"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite2"])
+a3<-sum(data2$sporozoites[data2$ind!="sporos0" & data2$oocysts==1 & data2$MBR=="Bite5"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite5"])
+a4<-sum(data2$sporozoites[data2$ind!="sporos0" & data2$oocysts==1 & data2$MBR=="Bites10"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bites10"])
+sdat<-c(a1,a2,a3,a4) ##proportion of sporozoite infection per oocysts given 1, 2, 5 or 10 MBR 
+
+probdata<-matrix(nrow=length(unique(data2$oocysts)),ncol=4)
+probdata<-as.data.frame(probdata)
+probdata$oocysts<-unique(data2$oocysts)
+colnames(probdata)[1]<-"Bite1";colnames(probdata)[2]<-"Bite2";colnames(probdata)[3]<-"Bite5";colnames(probdata)[4]<-"BiteS10"
+for (i in 1:length(unique(data2$oocysts))){
+  probdata[i,1]<-  1 - (1-sdat[1])^unique(data2$oocysts)[i]
+  probdata[i,2]<-  1 - (1-sdat[2])^unique(data2$oocysts)[i]
+  probdata[i,3]<-  1 - (1-sdat[3])^unique(data2$oocysts)[i]
+  probdata[i,4]<-  1 - (1-sdat[4])^unique(data2$oocysts)[i]
+}
+head(probdata)
 
 
+##prevalence of 1 sporozoites per oocyst per MBR
+a1<-sum(data2$sporozoites[data2$ind=="sporos1" & data2$oocysts==1 & data2$MBR=="Bite1"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite1"])
+a2<-sum(data2$sporozoites[data2$ind=="sporos1" & data2$oocysts==1 & data2$MBR=="Bite2"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite2"])
+a3<-sum(data2$sporozoites[data2$ind=="sporos1" & data2$oocysts==1 & data2$MBR=="Bite5"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite5"])
+a4<-sum(data2$sporozoites[data2$ind=="sporos1" & data2$oocysts==1 & data2$MBR=="Bites10"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bites10"])
+s1dat<-c(a1,a2,a3,a4)
 
+a<-sum(data2$sporozoites[data2$ind=="sporos2" & data2$oocysts==1 & data2$MBR=="Bite1"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite1"])
+b<-sum(data2$sporozoites[data2$ind=="sporos2" & data2$oocysts==1 & data2$MBR=="Bite2"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite2"])
+c<-sum(data2$sporozoites[data2$ind=="sporos2" & data2$oocysts==1 & data2$MBR=="Bite5"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite5"])
+d<-sum(data2$sporozoites[data2$ind=="sporos2" & data2$oocysts==1 & data2$MBR=="Bites10"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bites10"])
+s2dat<-c(a,b,c,d)
+s2datcum<-s1dat+s2dat
 
+f<-sum(data2$sporozoites[data2$ind=="sporos3" & data2$oocysts==1 & data2$MBR=="Bite1"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite1"])
+g<-sum(data2$sporozoites[data2$ind=="sporos3" & data2$oocysts==1 & data2$MBR=="Bite2"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite2"])
+h<-sum(data2$sporozoites[data2$ind=="sporos3" & data2$oocysts==1 & data2$MBR=="Bite5"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite5"])
+j<-sum(data2$sporozoites[data2$ind=="sporos3" & data2$oocysts==1 & data2$MBR=="Bites10"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bites10"])
+s3dat<-c(f,g,h,j)
+s3datcum<-s3dat+s2datcum
 
+a<-sum(data2$sporozoites[data2$ind=="sporos4" & data2$oocysts==1 & data2$MBR=="Bite1"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite1"])
+b<-sum(data2$sporozoites[data2$ind=="sporos4" & data2$oocysts==1 & data2$MBR=="Bite2"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite2"])
+c<-sum(data2$sporozoites[data2$ind=="sporos4" & data2$oocysts==1 & data2$MBR=="Bite5"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bite5"])
+d<-sum(data2$sporozoites[data2$ind=="sporos4" & data2$oocysts==1 & data2$MBR=="Bites10"])/sum(data2$sporozoites[data2$oocysts==1 & data2$MBR=="Bites10"])
+s4dat<-c(a,b,c,d)
+s4datcum<-s4dat+s3datcum;head(s4datcum);head(sdat)
 
+probdata1<-matrix(nrow=length(unique(data2$oocysts)),ncol=4)
+probdata1<-as.data.frame(probdata1)
+probdata1$oocysts<-unique(data2$oocysts)
+colnames(probdata1)[1]<-"Bite1";colnames(probdata1)[2]<-"Bite2";colnames(probdata1)[3]<-"Bite5";colnames(probdata1)[4]<-"BiteS10"
+for (i in 1:length(unique(data2$oocysts))){
+  probdata1[i,1]<-  1 - (1-s1dat[1])^unique(data2$oocysts)[i]
+  probdata1[i,2]<-  1 - (1-s1dat[2])^unique(data2$oocysts)[i]
+  probdata1[i,3]<-  1 - (1-s1dat[3])^unique(data2$oocysts)[i]
+  probdata1[i,4]<-  1 - (1-s1dat[4])^unique(data2$oocysts)[i]
+}
+head(probdata1)
 
+probdata2<-matrix(nrow=length(unique(data2$oocysts)),ncol=4)
+probdata2<-as.data.frame(probdata2)
+probdata2$oocysts<-unique(data2$oocysts)
+colnames(probdata2)[1]<-"Bite1";colnames(probdata2)[2]<-"Bite2";colnames(probdata2)[3]<-"Bite5";colnames(probdata2)[4]<-"BiteS10"
+for (i in 1:length(unique(data2$oocysts))){
+  probdata2[i,1]<-  1 - (1-s2datcum[1])^unique(data2$oocysts)[i]
+  probdata2[i,2]<-  1 - (1-s2datcum[2])^unique(data2$oocysts)[i]
+  probdata2[i,3]<-  1 - (1-s2datcum[3])^unique(data2$oocysts)[i]
+  probdata2[i,4]<-  1 - (1-s2datcum[4])^unique(data2$oocysts)[i]
+}
+head(probdata2)
 
+probdata3<-matrix(nrow=length(unique(data2$oocysts)),ncol=4)
+probdata3<-as.data.frame(probdata3)
+probdata3$oocysts<-unique(data2$oocysts)
+colnames(probdata3)[1]<-"Bite1";colnames(probdata3)[2]<-"Bite2";colnames(probdata3)[3]<-"Bite5";colnames(probdata3)[4]<-"BiteS10"
+for (i in 1:length(unique(data2$oocysts))){
+  probdata3[i,1]<-  1 - (1-s3datcum[1])^unique(data2$oocysts)[i]
+  probdata3[i,2]<-  1 - (1-s3datcum[2])^unique(data2$oocysts)[i]
+  probdata3[i,3]<-  1 - (1-s3datcum[3])^unique(data2$oocysts)[i]
+  probdata3[i,4]<-  1 - (1-s3datcum[4])^unique(data2$oocysts)[i]
+}
+head(probdata3)
 
+probdata4<-matrix(nrow=length(unique(data2$oocysts)),ncol=4)
+probdata4<-as.data.frame(probdata4)
+probdata4$oocysts<-unique(data2$oocysts)
+colnames(probdata4)[1]<-"Bite1";colnames(probdata4)[2]<-"Bite2";colnames(probdata4)[3]<-"Bite5";colnames(probdata4)[4]<-"BiteS10"
+for (i in 1:length(unique(data2$oocysts))){
+  probdata4[i,1]<-  1 - (1-s4datcum[1])^unique(data2$oocysts)[i]
+  probdata4[i,2]<-  1 - (1-s4datcum[2])^unique(data2$oocysts)[i]
+  probdata4[i,3]<-  1 - (1-s4datcum[3])^unique(data2$oocysts)[i]
+  probdata4[i,4]<-  1 - (1-s4datcum[4])^unique(data2$oocysts)[i]
+}
+head(probdata4)
 
+plot(c(0,probdata[1:20,1])~c(0,probdata[1:20,5]),xlab="Number of oocysts (logscale)",ylab="Probability of sporozoites")
+lines(c(0,probdata[1:20,1])~c(0,probdata[1:20,5]))
+lines(c(0,probdata[1:20,2])~c(0,probdata[1:20,5]))
+lines(c(0,probdata[1:20,3])~c(0,probdata[1:20,5]))
+lines(c(0,probdata[1:20,4])~c(0,probdata[1:20,5]))
 
+points(c(0,probdata1[1:20,1])~c(0,probdata1[1:20,5]))
+lines(c(0,probdata1[1:20,1])~c(0,probdata1[1:20,5]),lty=2)
+lines(c(0,probdata1[1:20,2])~c(0,probdata1[1:20,5]),lty=2)
+lines(c(0,probdata1[1:20,3])~c(0,probdata1[1:20,5]),lty=2)
+lines(c(0,probdata1[1:20,4])~c(0,probdata1[1:20,5]),lty=2)
 
+points(c(0,probdata2[1:20,1])~c(0,probdata2[1:20,5]))
+lines(c(0,probdata2[1:20,1])~c(0,probdata2[1:20,5]),lty=3)
+lines(c(0,probdata2[1:20,2])~c(0,probdata2[1:20,5]),lty=3)
+lines(c(0,probdata2[1:20,3])~c(0,probdata2[1:20,5]),lty=3)
+lines(c(0,probdata2[1:20,4])~c(0,probdata2[1:20,5]),lty=3)
 
+points(c(0,probdata3[1:20,1])~c(0,probdata3[1:20,5]))
+lines(c(0,probdata3[1:20,1])~c(0,probdata3[1:20,5]),lty=4)
+lines(c(0,probdata3[1:20,2])~c(0,probdata3[1:20,5]),lty=4)
+lines(c(0,probdata3[1:20,3])~c(0,probdata3[1:20,5]),lty=4)
+lines(c(0,probdata3[1:20,4])~c(0,probdata3[1:20,5]),lty=4)
 
+lines(c(0,probdata4[1:20,1])~c(0,probdata4[1:20,5]),lty=5)
+lines(c(0,probdata4[1:20,2])~c(0,probdata4[1:20,5]),lty=5)
+lines(c(0,probdata4[1:20,3])~c(0,probdata4[1:20,5]),lty=5)
+lines(c(0,probdata4[1:20,4])~c(0,probdata4[1:20,5]),lty=5)
+
+par(mfrow=c(2,2))
+plot(c(0,probdata[1:20,1])~c(0,probdata[1:20,5]),
+     main="MBR = 1 Bite",
+     xlab="Number of oocysts",ylab="Probability of sporozoites")
+lines(c(0,probdata[1:20,1])~c(0,probdata[1:20,5]))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,1]),rev(c(0,probdata2[1:20,1]))),border=NA, 
+        col = terrain.colors(10,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,1]),rev(c(0,probdata3[1:20,1]))),border=NA, 
+        col = terrain.colors(15,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,1]),rev(c(0,probdata4[1:20,1]))),border=NA, 
+        col = terrain.colors(25,alpha = 0.25))
+
+#arrows(5,probdata1[5,1],5,probdata4[5,1],length=0,col="chocolate4",lty=3)
+#arrows(10,probdata1[10,1],10,probdata4[10,1],length=0,col="chocolate4",lty=3)
+#arrows(20,probdata1[16,1],20,probdata4[20,1],length=0,col="chocolate4",lty=3)
+#
+
+plot(c(0,probdata[1:20,2])~c(0,probdata[1:20,5]),
+     main="MBR = 2 Bites",
+     xlab="Number of oocysts",ylab="Probability of sporozoites")
+lines(c(0,probdata[1:20,2])~c(0,probdata[1:20,5]))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,2]),rev(c(0,probdata2[1:20,2]))),border=NA, 
+        col = terrain.colors(10,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,2]),rev(c(0,probdata3[1:20,2]))),border=NA, 
+        col = terrain.colors(15,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,2]),rev(c(0,probdata4[1:20,2]))),border=NA, 
+        col = terrain.colors(25,alpha = 0.25))
+
+plot(c(0,probdata[1:20,3])~c(0,probdata[1:20,5]),
+     main="MBR = 5 Bites",
+     xlab="Number of oocysts",ylab="Probability of sporozoites")
+lines(c(0,probdata[1:20,3])~c(0,probdata[1:20,5]))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,3]),rev(c(0,probdata2[1:20,3]))),border=NA, 
+        col = terrain.colors(10,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,3]),rev(c(0,probdata3[1:20,3]))),border=NA, 
+        col = terrain.colors(15,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,3]),rev(c(0,probdata4[1:20,3]))),border=NA, 
+        col = terrain.colors(25,alpha = 0.25))
+
+plot(c(0,probdata[1:20,4])~c(0,probdata[1:20,5]),
+     main="MBR = 10 Bites",
+     xlab="Number of oocysts",ylab="Probability of sporozoites")
+lines(c(0,probdata[1:20,4])~c(0,probdata[1:20,5]))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,4]),rev(c(0,probdata2[1:20,4]))),border=NA, 
+        col = terrain.colors(10,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,4]),rev(c(0,probdata3[1:20,4]))),border=NA, 
+        col = terrain.colors(15,alpha = 0.25))
+polygon(c(c(0,probdata[1:20,5]), rev(c(0,probdata[1:20,5]))),c(c(0,probdata1[1:20,4]),rev(c(0,probdata4[1:20,4]))),border=NA, 
+        col = terrain.colors(25,alpha = 0.25))
+
+probdata1[1:20,]
+probdata4[1:20,]
+require(vcd)
+require(MASS)
+
+allfitdist(data2$correctedprob)
+fit1 <- fitdistr(data2$correctedprob, "exponential")
+ks.test(data2$correctedprob, "pexp", fit1$estimate)
+
+exp.mod<-function(p.val){
+  a<-p.val[1]
+  
+  predy<-(data2$oocysts/a^2)*exp(-data2$oocysts^2/(2*a^2))
+  datay<-data2$correctedprob
+  loglik1<- datay* log((predy)+0.00001)+(1-datay)*log(1-((predy)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-1
+prob1<-optim(c(0.95),exp.mod,method="L-BFGS-B",lower=0.5,upper=1)
+prob1
+
+predyest<-(nc/prob1$par[1]^2)*exp(-nc^2/(2*prob1$par[1]^2))
+lines(predyest~nc)
 
 
 
