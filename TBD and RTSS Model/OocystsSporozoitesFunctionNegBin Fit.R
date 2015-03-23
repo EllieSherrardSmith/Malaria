@@ -1053,11 +1053,11 @@ q1c<-quantile(pds2.new$c,0.025)##-0.490101
 q2c<-quantile(pds2.new$c,0.975)##-0.05949495
 q1a;q2a;q1b;q2b;q1c;q2c
 
-pred2lower2<-   q1a * exp (q1b * exp(q2c * nc))
+pred2lower2<-   q1a * exp (q1b  * exp(q2c * nc))
 pred2upper2<-   q2a * exp (q2b * exp(q1c * nc))
 
-pred2lower2<-   q1a * exp (q1b * exp(q2c * nc))
-pred2upper2<-   q2a * exp (q2b * exp(q1c * nc))
+pred2lower2<-   0.110101 * exp (-11.94949 * exp(-0.5959596 * nc))
+pred2upper2<-   0.589899 * exp (-7.151515 * exp(-0.6 * nc))
 
 lines(pred2lower2~nc)
 lines(pred2upper2~nc)
