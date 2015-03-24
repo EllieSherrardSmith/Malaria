@@ -1,8 +1,8 @@
 data{
-  int<lower=0> N_C; ##number of control groups = 20
-  int<lower=0> N_T; ##number of treatment groups = 20
-  int<lower=0> N_ooc;
-  int<lower=0> N_mice;
+  int<lower=0> N_C; ##number of control rounds = 20
+  int<lower=0> N_T; ##number of treatment rounds = 20
+  int<lower=0> N_ooc; ##number of oocysts in each round
+  int<lower=0> N_mice; ##number of mice = 5
   
   int<lower=0> ooc_count_C[N_ooc,N_C];
   int<lower=0> ooc_count_T[N_ooc,N_T];
