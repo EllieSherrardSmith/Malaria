@@ -1,11 +1,11 @@
 data{
-  int<lower=0> N_C; ##number of control rounds = 20
-  int<lower=0> N_T; ##number of treatment rounds = 20
-  int<lower=0> N_ooc; ##number of oocysts in each round
+  int<lower=0> N_C; ##number of control rounds/bites = 16 rounds 1 to 4 and bites 2 to 5 (as all atv were 0 for bite 1)
+  int<lower=0> N_T; ##number of treatment rounds = 16
+  int<lower=0> N_ooc; ##number of oocysts in each round (45) - reduced to 24 to get rid of NAs from some groups
   int<lower=0> N_mice; ##number of mice = 5
   
-  int<lower=0> ooc_count_C[N_ooc,N_C];
-  int<lower=0> ooc_count_T[N_ooc,N_T];
+  int<lower=0> ooc_count_C[N_ooc,N_C]; ##the raw data counts of the oocysts for each group for controls
+  int<lower=0> ooc_count_T[N_ooc,N_T]; ##for atv
   
   int<lower=0> prev_C[N_mice,N_C];
   int<lower=0> prev_T[N_mice,N_T];
@@ -62,13 +62,13 @@ model{
   alpha_theta ~ normal(0,2);
 
   for(n in 1:N_ooc){
-    ooc_count_C[n] ~ neg_binomial(exp(logmu_ooc_C),exp(logsigma_ooc_C));//NEED TO CHECK AS NOT THE SAME NEG BIN AS IN r
-    ooc_count_T[n] ~ neg_binomial(exp(logmu_ooc_T),exp(logsigma_ooc_T));//NEED TO CHECK AS NOT THE SAME NEG BIN AS IN r
+    ooc_count_C[n] ~ neg_binomial_2(exp(logmu_ooc_C),exp(logsigma_ooc_C));//NEED TO CHECK AS NOT THE SAME NEG BIN AS IN r
+    ooc_count_T[n] ~ neg_binomial_2(exp(logmu_ooc_T),exp(logsigma_ooc_T));//NEED TO CHECK AS NOT THE SAME NEG BIN AS IN r
     }
   Sum <- 0;
   for(n in 1:(N_bin-1)){
-    p[n] <- neg_binomial_cdf(bin_edge[n+1],exp(logmu_s_C),exp(logsigma_s_C))
-                        -neg_binomial_cdf(bin_edge[n],exp(logmu_s_C),exp(logsigma_s_C));
+    p[n] <- neg_binomial_2_cdf(bin_edge[n+1],exp(logmu_s_C),exp(logsigma_s_C))
+                        -neg_binomial_2_cdf(bin_edge[n],exp(logmu_s_C),exp(logsigma_s_C));
     Sum <- Sum+p[n];
   }
   p[N_bin] <- 1-Sum;
@@ -78,8 +78,8 @@ model{
   }
     Sum <- 0;
   for(n in 1:N_bin){
-    p[n] <- neg_binomial_cdf(bin_edge[n+1],exp(logmu_s_T),exp(logsigma_s_T))
-                        -neg_binomial_cdf(bin_edge[n],exp(logmu_s_T),exp(logsigma_s_T));
+    p[n] <- neg_binomial_2_cdf(bin_edge[n+1],exp(logmu_s_T),exp(logsigma_s_T))
+                        -neg_binomial_2_cdf(bin_edge[n],exp(logmu_s_T),exp(logsigma_s_T));
       Sum <- Sum+p[n];
   }
   p[N_bin] <- 1-Sum;
