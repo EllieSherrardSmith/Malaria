@@ -265,9 +265,9 @@ optim.model<-sat.binom(satmod$par)
 
 size.of.grid<-10
 a.range<-seq(0.7,0.99,length=size.of.grid)
-b.range<-seq(0.1,0.6,length=size.of.grid)
-c.range<-seq(0.3,0.7,length=size.of.grid)
-d.range<-seq(3.6,4.6,length=size.of.grid)
+b.range<-seq(0.15,0.6,length=size.of.grid)
+c.range<-seq(0.3,0.8,length=size.of.grid)
+d.range<-seq(2.5,5,length=size.of.grid)
 pds<-expand.grid("a"=a.range,"b"=b.range,"c"=c.range,"d"=d.range)
 pds$modcom<-NA
 
@@ -297,14 +297,15 @@ q2d<-quantile(pds.new$d,0.975);q2d##
 predlower<-   (q1a * nc^q1c)/(q1d + q2b * nc^q1c) 
 predupper<-   (q2a * nc^q2c)/(q2d + q1b * nc^q2c)  
 
+par(mfrow=c(1,1));par(mar=c(5,5,5,5))
 plot(meanoocysts,MEANsp,
      ylim=c(0,3),ylab="Mean sporozoite score",
-     xlim=c(0,max(meanoocysts)),xlab="Oocyst mean intensity")
+     xlim=c(0,max(meanoocysts)),xlab="Oocyst mean intensity",cex.lab=2)
 lines(predupper~nc)
 lines(predlower~nc)
 polygon(c(nc, rev(nc)),c(predupper,rev(predlower)),border=NA, col="aquamarine1")
 lines(pred~nc)
-points(meanoocysts,MEANsp,col="aquamarine4",pch=19)
+points(meanoocysts,MEANsp,col="aquamarine4",pch=16)
 ##########################################################################
 ##
 ## 2. Fit the distributions of the data and estimate the real sporozoite counts
@@ -354,6 +355,8 @@ data2<-list(N_Comb=32,
             bin_edge=c(0,1,10,100,1000,10000),
             s_count = structure(.Data=rbind(spors_C,spors_T),.Dim=c(32,5)))
 
+
+
 ##And considering solely the control data
 data2control<-list(N_Comb=16,
             N_ooc=24,
@@ -377,42 +380,6 @@ names(params)
 traceplot(fit2)
 
 ##cALCULATE THE RESPECTIVE PREDICTED POPULATIONS OF OOCYSTS AND SPOROZOITES AND PREVALENCE IN MICE
-sampmean<-mean(params$mu_s)
-sampvar<-mean(params$mu_s)+((mean(params$mu_s)^2)/mean(params$sigma_s))
-N=500
-k<-(sampmean^2-(sampvar/N))/(sampvar-sampmean)
-
-Ns<-rnegbin(N,sampmean,k)
-sort(Ns)
-length(Ns[Ns==0])
-length(Ns[Ns>0 & Ns < 11])
-length(Ns[Ns>10 & Ns < 101])
-length(Ns[Ns==100 & Ns <1001])
-
-sampmean2<-mean(params$logmu_ooc)
-sampvar2<-mean(params$logmu_ooc)+((mean(params$logmu_ooc)^2)/exp(mean(params$logsigma_ooc)))
-N=500
-k2<-(sampmean2^2-(sampvar2/N))/(sampvar2-sampmean2)
-
-Nooc<-rnegbin(N,sampmean2,k2)
-sort(Nooc)
-length(Nooc[Nooc==0])
-length(Nooc[Nooc>0 & Nooc < 11])
-length(Nooc[Nooc>10 & Nooc < 101])
-length(Nooc[Nooc==100 & Nooc <1001])
-
-##from Probability oocyst causing infection (1 - (1-s)^x) where x == N oocysts and s is theta (probability of infection given 1 oocyst)
-x<-seq(1,70,1)
-Nsporos <- ((1 - (1/exp(beta_mu[1] * logmu_ooc + beta_mu[2] * logsigma_ooc + alpha_mu))^(x-1)) * (1/exp(beta_mu[1] * logmu_ooc + beta_mu[2] * logsigma_ooc + alpha_mu))
-plot(Nsporos ~ x)            
-
-
-sampler_params<-get_sampler_params(fit2, inc_warmup=FALSE)
-sapply(sampler_params, function(x) c(x[, 'accept_stat__']))
-
-Ns<-seq(0,1000,1)
-Nooc<-seq(0,150,1)
-x<-mean(params$sigma_s)
 
 Nsp_mu<-(exp(params$beta_mu[1] * params$logmu_ooc + params$beta_mu[2] * params$logmu_ooc + params$alpha_mu))
 Nsp_sigma<-(exp(params$beta_sigma[1] * params$logsigma_ooc + params$beta_sigma[2] * params$logsigma_ooc + params$alpha_mu))
@@ -420,51 +387,131 @@ Nsp_sigma<-(exp(params$beta_sigma[1] * params$logsigma_ooc + params$beta_sigma[2
 sampmeanSPmu<-exp(params$beta_mu[1] * params$logmu_ooc + params$beta_mu[2] * params$logsigma_ooc + params$alpha_mu)
 sampmeanSPsigma<-exp(params$beta_sigma[1] * params$logsigma_ooc + params$beta_sigma[2] * params$logsigma_ooc + params$alpha_sigma)
 sampvarSP<-sampmeanSPmu+(sampmeanSPmu^2/sampmeanSPsigma)
-N=length(params$beta_mu)
+N=200
 predNs_k<-(sampmeanSPmu^2-(sampvarSP/N))/(sampvarSP-sampmeanSPmu)
 
-Ns<-sort(rnegbin(length(probInf),mean(sampmeanSPmu),mean(predNs_k)))
-x<-mean(params$theta)
-
-probInf<-(exp(params$beta_mu[2] * sampmeanSPmu + params$beta_sigma[2] * sampmeanSPsigma + params$alpha_theta))/
-  (1 + exp(params$beta_mu[2] * sampmeanSPmu + params$beta_sigma[2] * sampmeanSPsigma + params$alpha_theta))^x *
-  (1-(exp(params$beta_mu[2] * sampmeanSPmu + params$beta_sigma[2] * sampmeanSPsigma + params$alpha_theta)/
-     (1 + exp(params$beta_mu[2] * sampmeanSPmu + params$beta_sigma[2] * sampmeanSPsigma + params$alpha_theta))))^(1-x)
-
-plot(probInf~Ns,log="x")
+NSP<-rnegbin(N,sampmeanSPmu,predNs_k)
+sort(NSP)
+length(NSP[NSP==0])
+length(NSP[NSP>0 & NSP < 11])
+length(NSP[NSP>10 & NSP < 101])
+length(NSP[NSP==100 & NSP <1001])
+length(NSP[NSP>1000])
 
 
+###################################################################
+##
+## tRYING EACH GROUP independently
+##
+##
+###################################
 
-#################
-#################
-##Model 3
-data3<-list(N_Comb=32,
-            N_ooc=24,
-            ooc_count = structure(.Data = c(oocystsC,oocystsT),
-                                  .Dim=c(24,32)),
-            N_bin=5,
-            bin_edge=c(0,1,10,100,1000,10000),
-            s_count = structure(.Data=rbind(spors_C,spors_T),.Dim=c(32,5)))
+########################################
+##gp A (bite2 round1 Treatment = control)
+data2bites2rd1control<-list(N_Comb=1,
+                            N_ooc=24,
+                            N_mice=5,
+                            ooc_count = structure(.Data = c(oocystsC[1:24]),
+                                                  .Dim=c(24,1)),
+                            prev = structure(.Data =c(PREV_C[,1]),.Dim=c(5,1)),
+                            N_bin=5,
+                            bin_edge=c(0,1,10,100,1000,1002),
+                            s_count = structure(.Data=rbind(spors_C[1,]),.Dim=c(1,5)))
 
-fit3 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL3stan.stan", data=data3,
+fit2gpA <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=data2bites2rd1control,
              iter=100, chains=4)
-print(fit3)
-plot(fit3)
 
-params = extract(fit2)
+print(fit2gpA);params = extract(fit2gpA)
 names(params)
-traceplot(fit2)
-
-##cALCULATE THE RESPECTIVE PREDICTED POPULATIONS OF OOCYSTS AND SPOROZOITES AND PREVALENCE IN MICE
-sampmean<-mean(params$mu_s)
-sampvar<-mean(params$mu_s)+((mean(params$mu_s)^2)/mean(params$sigma_s))
-N=500
-k<-(sampmean^2-(sampvar/N))/(sampvar-sampmean)
-
-Ns<-rnegbin(N,sampmean,k)
-sort(Ns)
-
-sampler_params<-get_sampler_params(fit2, inc_warmup=FALSE)
-sapply(sampler_params, function(x) c(x[, 'accept_stat__']))
+meangpA<-mean(params$mu_s)
+vargpA<-mean(params$mu_s) + mean(params$mu_s)^2/mean(params$sigma_s)
+N = 10
+kgpA = (meangpA^2-(vargpA/N))/(vargpA-meangpA)
 
 
+Nsp_gpA<-rnegbin(N,meangpA,kgpA)
+sort(Nsp_gpA)
+length(Nsp_gpA[Nsp_gpA==0])
+length(Nsp_gpA[Nsp_gpA>0 & Nsp_gpA < 11])
+length(Nsp_gpA[Nsp_gpA>10 & Nsp_gpA < 101])
+length(Nsp_gpA[Nsp_gpA==100 & Nsp_gpA <1001])
+length(Nsp_gpA[Nsp_gpA>1000])
+
+#######################
+## And gp B (bite2 round2 Treatment = control)
+
+data2bites2rd2control<-list(N_Comb=1,
+                            N_ooc=24,
+                            N_mice=5,
+                            ooc_count = structure(.Data = c(oocystsC[25:48]),
+                                                  .Dim=c(24,1)),
+                            prev = structure(.Data =c(PREV_C[,2]),.Dim=c(5,1)),
+                            N_bin=5,
+                            bin_edge=c(0,1,10,100,1000,1002),
+                            s_count = structure(.Data=rbind(spors_C[2,]),.Dim=c(1,5)))
+
+fit2gpB <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=data2bites2rd2control,
+                iter=100, chains=4)
+
+print(fit2gpB);params = extract(fit2gpB)
+names(params)
+meangpB<-mean(params$mu_s)
+vargpB<-mean(params$mu_s) + mean(params$mu_s)^2/mean(params$sigma_s)
+N = 10
+kgpB = (meangpB^2-(vargpB/N))/(vargpB-meangpB)
+
+
+Nsp_gpB<-rnegbin(N,meangpA,kgpA)
+sort(Nsp_gpB)
+length(Nsp_gpB[Nsp_gpB==0])
+length(Nsp_gpB[Nsp_gpB>0 & Nsp_gpB < 11])
+length(Nsp_gpB[Nsp_gpB>10 & Nsp_gpB < 101])
+length(Nsp_gpB[Nsp_gpB==100 & Nsp_gpB <1001])
+length(Nsp_gpB[Nsp_gpB>1000])
+
+
+#######################
+## And gp XXX (bite XX round XX Treatment = XXXXX)
+
+dataA<-list(N_Comb=1,
+                            N_ooc=24,
+                            N_mice=5,
+                            ooc_count = structure(.Data = c(oocystsC[361:384]),
+                                                  .Dim=c(24,1)),
+                            prev = structure(.Data =c(PREV_C[,16]),.Dim=c(5,1)),
+                            N_bin=5,
+                            bin_edge=c(0,1,10,100,1000,1002),
+                            s_count = structure(.Data=rbind(spors_C[16,]),.Dim=c(1,5)))
+
+fit2gpB <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=dataA,
+                iter=100, chains=4)
+print(fit2gpB)
+
+
+meansporsdist<-c(25.04,0.66,16.80,15.24,20.98,85.70,16.21,19.77,33.36,26.91,7.02,19.28,18.37,29.67,31.31,36.44)
+meanoocystsdist<-c(meanoocysts[1:16])
+plot(meansporsdist~meanoocystsdist)
+
+sat.binom<-function(p.vec){
+  
+  #a<-p.vec[1]
+  a<-p.vec[1]
+  b<-p.vec[2]
+  c<-p.vec[3]
+  d<-p.vec[4]
+  
+  pred<- (a * meanoocystsdist^c)/(d + b * meanoocystsdist^c)
+  
+  data1<-meansporsdist
+  
+  loglik<- data1* log((pred)+0.001)+(1-data1)*log(1-((pred)-0.001))
+  
+  
+  -sum(loglik,na.rm=T)
+}
+n.param<-3
+satmod<-optim(c(25,0.6,1,4),sat.binom,method="L-BFGS-B",lower=c(0,0.001,0.01,0.1),upper=c(100,10,10,5))
+satmod
+nc<-seq(0,max(meanoocysts),1)
+pred<-(satmod$par[1] * nc^satmod$par[3])/(satmod$par[4] + satmod$par[2] * nc^satmod$par[3]) 
+lines(nc,pred,lwd=2,lty=2,col="red")
