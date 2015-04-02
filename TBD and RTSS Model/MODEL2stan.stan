@@ -38,12 +38,12 @@ model{
   alpha_sigma ~ normal(0,2);
   alpha_theta ~ normal(0,2);
     for(n in 1:N_ooc){
-      ooc_count[n] ~ neg_binomial_2(exp(logmu_ooc),exp(logsigma_ooc));
+      ooc_count[n] ~ neg_binomial(exp(logmu_ooc),exp(logsigma_ooc));
   }
   Sum <- 0;
     for(n in 1:(N_bin-1)){
-      p[n] <- neg_binomial_2_cdf(bin_edge[n+1],exp(logmu_s),exp(logsigma_s))
-        -neg_binomial_2_cdf(bin_edge[n],exp(logmu_s),exp(logsigma_s));
+      p[n] <- neg_binomial_cdf(bin_edge[n+1],exp(logmu_s),exp(logsigma_s))
+        -neg_binomial_cdf(bin_edge[n],exp(logmu_s),exp(logsigma_s));
   Sum <- Sum+p[n];
   }
   p[N_bin] <- 1-Sum;
