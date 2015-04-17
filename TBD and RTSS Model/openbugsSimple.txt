@@ -1,0 +1,23 @@
+model {
+  for(n in 1:N_mice) 
+    {
+    prev_C[n] ~ dbern(logit_theta_C[n])
+    logit_theta_C[n] <- beta_thetaA[n] * log_mu_ooc_C[n] + beta_thetaB[n] * log_sigma_ooc_C[n] + alpha_theta[n]
+    prev_T[n] ~ dbern(logit_theta_T[n])
+    logit_theta_T[n] <- beta_thetaA[n] * log_mu_ooc_T[n] + beta_thetaB[n] * log_sigma_ooc_T[n] + alpha_theta[n]
+  }
+  for (m in 1:N_ooc)
+    {
+  ooccountC[m] <- dnegbin(log_mu_ooc_C[m], log_sigma_ooc_C[m])
+  ooccountT[m] <- dnegbin(log_mu_ooc_T[m], log_sigma_ooc_T[m])
+    }
+  log_mu_ooc_C ~ dpois(5)
+  log_sigma_ooc_C ~ dpois(5)
+  log_mu_ooc_T ~ dpois(2)
+  log_sigma_ooc_T ~ dnorm(2)
+  beta_thetaA ~ dnorm(0,2)
+  beta_thetaB ~ dnorm(0,2)
+  alpha_theta ~ dnorm(0,2)
+  }  
+
+http://stackoverflow.com/questions/11167154/r-predict-0-1-in-logistic-regression-in-glm

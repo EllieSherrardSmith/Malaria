@@ -1,0 +1,50 @@
+model {
+  for(n in 1:N_mice) {
+    prev_C[n] ~ dbern(logit_theta_C[n])
+    logit_theta_C[n] <-    beta_thetaA * log_mu_s_C[n]  + beta_thetaB * log_sigma_s_C[n] + alpha_theta
+  
+  for(j in 1:N_C) {
+      p1[j] <-   dnegbin(log_mu_s_C[j], log_sigma_s_C[j])
+      log_mu_s_C[j] <-   beta_muA * log_mu_ooc_C[j] + beta_muB * log_sigma_ooc_C[j] + alpha_mu
+      log_sigma_s_C[j] <-   beta_sigmaA * log_mu_ooc_C[j] + beta_sigmaB * log_sigma_ooc_C[j] + alpha_sigma
+    }
+    s_count_C[j] ~ multinomial(p1)
+  
+  for (m in 1:N_ooc){
+  ooc_count_C[m] ~ dnegbin(log_mu_ooc_C[m], log_sigma_ooc_C[m])
+  
+  }
+  }
+
+  for(n in 1:N_mice) {
+    prev_T[n] ~ dbern(logit_theta_T[n])
+    logit_theta_C[n] <-    beta_thetaA * log_mu_s_T[n]  + beta_thetaB * log_sigma_s_T[n] + alpha_theta
+    
+    for (i in 1:N_C){
+      p2[i] <-   dnegbin(log_mu_s_T[i], log_sigma_s_T[i])
+      log_mu_s_T[i] <-   beta_muA * log_mu_ooc_T[i] + beta_muB * log_sigma_ooc_T[i] + alpha_mu
+      log_sigma_s_T[i] <-   beta_sigmaA * log_mu_ooc_T[i] + beta_sigmaB * log_sigma_ooc_T[i] + alpha_sigma
+    }
+    s_count_T[i] ~ multinomial(p2)
+  for (q in 1:N_ooc){
+    ooc_count_T[q] ~ dnegbin(log_mu_ooc_T[q], log_sigma_ooc_T[q])
+  }
+}
+  log_mu_ooc_C ~ dnorm(0, 5)
+  log_sigma_ooc_C ~ dnorm(0, 5)
+  log_mu_ooc_T ~ dnorm(0, 5)
+  log_sigma_ooc_T ~ dnorm(0, 5)
+  
+  beta_muA ~ dnorm(0, 2)
+  beta_muB ~ dnorm(0, 2)
+  beta_sigmaA ~ dnorm(0, 2)
+  beta_sigmaB ~ dnorm(0, 2)
+  beta_thetaA ~ dnorm(0, 2)
+  beta_thetaB ~ dnorm(0, 2)
+  
+  alpha_mu ~ dnorm(0, 2)
+  alpha_sigma ~ dnorm(0, 2)
+  alpha_theta ~ dnorm(0, 2)
+  }
+
+  

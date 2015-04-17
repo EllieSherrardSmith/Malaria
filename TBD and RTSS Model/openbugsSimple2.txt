@@ -1,0 +1,17 @@
+model {
+##Priors
+  beta_thetaA ~ dnorm(0,2)
+  beta_thetaB ~ dnorm(0,2)
+  alpha_theta ~ dnorm(0,2)
+
+## Likelihood
+
+ for (i in 1:N_mice) {
+    infected[i] ~ dbin(p[i], 1)
+}
+  for (n in 1:N_ooc) {
+    logit(p[n]) <- (alpha_theta + beta_thetaA * log_ooc_C[n] +
+                            beta_thetaB  * log_ooc_C[n])
+ }
+ logit(log_ooc_C) ~ dnegbin(exp(beta_thetaA), exp(beta_thetaB))
+ }

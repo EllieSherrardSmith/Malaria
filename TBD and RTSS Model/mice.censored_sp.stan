@@ -173,13 +173,13 @@ generated quantities {
   int<lower=0> sim_ooc_count_C[N_C];
   int<lower=0> sim_ooc_count_T[N_T];
   
-  //real<lower=0> mu_s_C[N_C];
-  //real<lower=0> sigma_s_C[N_C];
-  //real<lower=0> mu_s_T[N_T];
-  //real<lower=0> sigma_s_T[N_T];
-    
-  //real<lower=0, upper=1> theta_C[N_C];
-  //real<lower=0, upper=1> theta_T[N_T];
+  real<lower=0> mu_s_C[N_C];
+  real<lower=0> sigma_s_C[N_C];
+  real<lower=0> mu_s_T[N_T];
+  real<lower=0> sigma_s_T[N_T];
+  
+  real<lower=0, upper=1> theta_C[N_C];
+  real<lower=0, upper=1> theta_T[N_T];
 
   for (n in 1:N_C) {
     sim_ooc_count_C[n] <- neg_binomial_2_rng(exp(log_mu_ooc_C), exp(log_sigma_ooc_C));
@@ -189,7 +189,7 @@ generated quantities {
     sim_ooc_count_T[n] <- neg_binomial_2_rng(exp(log_mu_ooc_T), exp(log_sigma_ooc_T));
   }
   
-  /*
+  
   for (n in 1:N_C) {
     mu_s_C[n] <- exp(  beta_mu[1] * log_mu_ooc_C
                      + beta_mu[2] * log_sigma_ooc_C
@@ -213,6 +213,6 @@ generated quantities {
                             + beta_theta[2] * log(sigma_s_T[n])
                             + alpha_theta);
   }
-  */
+  
   
 }

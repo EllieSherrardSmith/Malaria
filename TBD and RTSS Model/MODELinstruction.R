@@ -1,8 +1,9 @@
-
+library(nlme)
 library(rstan)
 library(MASS)
 library(boot)
 library(coda)
+library(R2OpenBUGS)
 
 ##########################################################################
 ## 
@@ -256,6 +257,14 @@ MEANsp<-c(mean(a1),mean(b1),mean(c1),mean(d1),
             mean(jj),mean(kk),mean(l),mean(m),
             mean(nn),mean(oo),mean(pp),mean(qq))
 
+prevcon<-prevtreat<-numeric(16)
+  for (i in 1:16){
+    prevcon[i]<-c(sum(PREV_C[,i])/5)
+    prevtreat[i]<-c(sum(PREV_T[,i])/5)
+    }
+
+prevs<-c(prevcon,prevtreat)
+
 ############################################################################
 ##
 ## 1. Fit for the mean distribution of sporozoite scores to oocyst counts
@@ -339,33 +348,140 @@ polygon(c(nc, rev(nc)),c(predupper,rev(predlower)),border=NA, col="aquamarine1")
 lines(pred~nc)
 points(meanoocysts,MEANsp,col="aquamarine4",pch=16)
 
+############################################################################
+##
+## 2. Fit for the prevalence of infection in mice to oocyst counts from mosquito
+##
+##
+##
+############################################################################
+
+datprev<-data.frame(prevs,meanoocysts,MEANsp)
+datprev$treat<-c(rep("Con",16),rep("Treat",16))
+datprev$prevs<-ifelse(datprev$meanoocysts==0,0,datprev$prevs)
+
+plot(c(0,prevs)~c(0,meanoocysts),ylim=c(0,1),xlim=c(0,max(meanoocysts)))
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * c(0,meanoocysts))) / (1 + exp(a + b * c(0,meanoocysts))) ) 
+  prev1<-c(0,prevs)
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,max(meanoocysts),1)
+pred2<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) ) 
+lines(nc,pred2,lwd=2,lty=2,col="red")
+
+
+#fit individual Gompertz models to each TREATMENT group
+out.nls<-nlsList(prevs~SSgompertz(meanoocysts,a0,b0,b1)|treat, data=datprev)
+## SSgompertz(x,a0,b0,b1): y(f(x)) = a0 exp(-b0 b1^x)
+#Gompertz parameters for each group
+coef(out.nls)
+#plot(intervals(out.nls),layout=c(3,1))
+
+apply(coef(out.nls), 2, mean)->parm.means
+apply(coef(out.nls), 2, range)->parm.range
+parm.means
+parm.range
+
+gom.binom<-function(p.vec){
+  a0<-p.vec[1]
+  b0<-p.vec[2]
+  b1<-p.vec[3]
+  
+  pred1<- (a0 * exp (-b0 * b1 ^datprev$meanoocysts)) 
+  data1<- datprev$prevs
+  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-3
+gommod<-optim(c(0.7266714, 1.3155981, 0.8747033),gom.binom,method="L-BFGS-B",lower=c(0.7,0.3,0.6),upper=c(0.9,2.3,0.89))
+gommod
+
+nc<-seq(0,max(meanoocysts),1)
+pred2a<-(gommod$par[1] * exp (-gommod$par[2] * gommod$par[3] ^  nc))
+lines(nc,pred2a,lwd=2,lty=2,col="blue")
+
+
+gom.binom<-function(p.vec){
+  Z<-p.vec[1]
+  B<-p.vec[2]
+  G0<-p.vec[3]
+  
+  pred1<- (Z/B) * exp (-exp(G0 - B * meanoocysts))
+  data1<- prevs
+  loglik1<- data1* log((pred1)+0.00001)+(1-data1)*log(1-((pred1)-0.00001))
+  -sum(loglik1,na.rm=T)
+}
+n.param<-3
+gommod<-optim(c(0.25, 0.24, 0.9),gom.binom,method="L-BFGS-B",lower=c(0.2,0.24,0.97),upper=c(0.24,0.8,1))
+gommod
+
+nc<-seq(0,max(meanoocysts),1)
+pred2b<-(gommod$par[1]/gommod$par[2]) * exp (-exp(gommod$par[3] - gommod$par[2] * nc))
+lines(nc,pred2b,lwd=2,lty=3,col="blue")
+
+
 
 ##########################################################################
 ##
-## 2. Fit the distributions of the data and estimate the real sporozoite counts and prevalence 
+## 3. Fit the distributions of the data and estimate the real sporozoite counts and prevalence 
 ##    with and without treatment to get the difference in the probaility of transmission
 ##  
 ##
 ###########################################################################
 data1<-list(N_C=16,
             N_T=16,
+            #N_T1=16 ##ATV
+            #N_T2=16 ##4B7
+            #N_T3=16 ##PEvaccine
+            #N_T4=16 ##PEvaccine + ATV
+            #N_T5=16 ##PEvaccine + 4B7
             N_ooc=24,
             N_mice=5,
             ooc_count_C = structure(.Data = c(oocystsC),
                           .Dim=c(24,16)),
             ooc_count_T = structure(.Data = c(oocystsT),
                                     .Dim=c(24,16)),
+            #oc_count_T1 = structure(.Data = c(oocystsT),
+            #                        .Dim=c(24,16)),
+            #ooc_count_T2 = structure(.Data = c(oocystsT),
+            #                        .Dim=c(24,16)),
+            #ooc_count_T3 = structure(.Data = c(oocystsT),
+            #                        .Dim=c(24,16)),
+            #ooc_count_T4 = structure(.Data = c(oocystsT),
+            #                        .Dim=c(24,16)),
+            #ooc_count_T5 = structure(.Data = c(oocystsT),
+            #                        .Dim=c(24,16)),
             prev_C = structure(.Data =PREV_C,.Dim=c(5,16)),
             prev_T = structure(.Data =PREV_T,.Dim=c(5,16)),
+            #prev_T1 = structure(.Data =PREV_T,.Dim=c(5,16)),
+            #prev_T2 = structure(.Data =PREV_T,.Dim=c(5,16)),
+            #prev_T3 = structure(.Data =PREV_T,.Dim=c(5,16)),
+            #prev_T4 = structure(.Data =PREV_T,.Dim=c(5,16)),
+            #prev_T5 = structure(.Data =PREV_T,.Dim=c(5,16)),
             N_bin=5,
-            bin_edge=c(0,1,10,100,1000,1002),
+            bin_edge=c(0,1,10,100,1000,10000),
             s_count_C = structure(.Data=spors_C,.Dim=c(16,5)),
-            s_count_T = structure(.Data=spors_T,.Dim=c(16,5))
+            s_count_T = structure(.Data=spors_T,.Dim=c(16,5))#,
+            #s_count_T1 = structure(.Data=spors_T,.Dim=c(16,5)),
+            #s_count_T2 = structure(.Data=spors_T,.Dim=c(16,5)),
+            #s_count_T3 = structure(.Data=spors_T,.Dim=c(16,5)),
+            #s_count_T4 = structure(.Data=spors_T,.Dim=c(16,5)),
+            #s_count_T5 = structure(.Data=spors_T,.Dim=c(16,5))
             )
 
 stan_rdump(ls(data1), "Ellie.data.R", envir=list2env(data1))
 fit1 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\mice.censored_sp.stan", data=data1,
-             iter=100, chains=2)
+             iter=1000, chains=2)
 print(fit1)
 
 params = extract(fit1)
@@ -746,13 +862,15 @@ flm <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and
            iter=1000, chains=4)
 print(flm);params = extract(flm)
 names(params)
-nooc<-seq(0,280,1)
+nooc<-seq(0,100,1)
 NspPredLM<-3.51*nooc + 0
 NspPredLMmin<-2.55*nooc + 0
 NspPredLMmax<-4.51*nooc + 0
 plot(NspPredLMmax~nooc)
 points(NspPredLMmin~nooc)
 points(NspPredLM~nooc,pch=16)
+
+points(meanoocystsdist,meansporsdist,pch=19,col="red")
 dataC_lm<-data.frame(nooc,NspPredLM,NspPredLMmin,NspPredLMmax);head(dataC_lm)
 
 controls<-merge(freqdistoocC, dataC_lm, by.x = "Nooc", by.y = "nooc",all.x=TRUE);head(controls)
@@ -851,4 +969,83 @@ nb91<-((r/(r+m))^r) *
   (m/(r+m))^k
 nb1;nb2;nb3;nb4;nb5;nb6;nb7;nb8;nb9;nb91
 nb1+nb2+nb3+nb4+nb5+nb6+nb7+nb8+nb9+nb91
+
+######################################################################################
+##
+##   tRYING THE MODEL IN oPENbUGS
+##
+##
+########################################################################################
+
+##Simpler (Oocysts to prevalence)
+
+data<-list(N_ooc=384,
+            N_mice=80,
+            ooccountC = c(oocystsC),
+            ##ooccountT = c(oocystsT),
+            prev_C = c(PREV_C))##,
+            ##prev_T = c(PREV_T))
+
+
+
+inits <- function(){
+  list(log_ooc_C = rnorm(data$N_ooc, 0, 20),
+       beta_thetaA = rnorm(data$N_mice, 0, 1),
+       beta_thetaB = rnorm(data$N_mice, 0, 1),
+       alpha_theta = rnorm(data$N_mice, 0, 1))
+}
+
+M2Msim1 <- bugs(data, inits, model.file = "C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\openbugsSimple2.txt",
+                parameters = c("log_mu_ooc_C", "log_sigma_ooc_C",
+                               "log_mu_ooc_T", "log_sigma_ooc_T",
+                               "beta_thetaA", "beta_thetaB","alpha_theta"),
+                n.chains = 3, n.iter = 1000, debug=TRUE)
+
+
+
+
+
+
+
+
+data<-list(N_C=16,
+            N_T=16,
+            N_ooc=24,
+            N_mice=5,
+            ooc_count_C = structure(.Data = c(oocystsC),
+                                    .Dim=c(24,16)),
+            ooc_count_T = structure(.Data = c(oocystsT),
+                                    .Dim=c(24,16)),
+            prev_C = structure(.Data =PREV_C,.Dim=c(5,16)),
+            prev_T = structure(.Data =PREV_T,.Dim=c(5,16)),
+            N_bin=5,
+            bin_edge=c(0,1,10,100,1000,10000),
+            s_count_C = structure(.Data=spors_C,.Dim=c(16,5)),
+            s_count_T = structure(.Data=spors_T,.Dim=c(16,5))
+)
+
+
+inits <- function(){
+       list(log_mu_ooc_C = rnorm(data$N_ooc, 0, 200),
+             log_sigma_ooc_C = rnorm(data$N_ooc, 0, 200),
+             log_mu_ooc_T = rnorm(data$N_ooc, 0, 100),
+             log_sigma_ooc_T = rnorm(data$N_ooc, 0, 100),
+             beta_muA = rnorm(data$N_C, 0, 200),
+             beta_muB = rnorm(data$N_C, 0, 200),
+             beta_sigmaA = rnorm(data$N_C, 0, 200),
+             beta_sigmaB = rnorm(data$N_C, 0, 200),
+             beta_thetaA = rnorm(data$N_mice, 0, 1),
+             beta_thetaB = rnorm(data$N_mice, 0, 1),
+             alpha_mu = rnorm(data$N_C, 0, 200),
+             alpha_sigma = rnorm(data$N_C, 0, 200),
+             alpha_theta = rnorm(data$N_mice, 0, 1))
+}
+
+M2Msim1 <- bugs(data, inits, model.file = "C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\openbugs.txt",
+                                           parameters = c("log_mu_ooc_C", "log_sigma_ooc_C",
+                                                           "log_mu_ooc_T", "log_sigma_ooc_T",
+                                                           "beta_muA", "beta_muB", "beta_sigmaA", "beta_sigmaB",
+                                                           "beta_thetaA", "beta_thetaB",
+                                                           "alpha_mu", "alpha_sigma", "alpha_theta"),
+                                           n.chains = 3, n.iter = 1000, debug=TRUE)
 
