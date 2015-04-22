@@ -4,7 +4,8 @@ library(MASS)
 library(boot)
 library(coda)
 library(R2OpenBUGS)
-
+library(ggplot2)
+library("Rlab")
 ##########################################################################
 ## 
 ##  ##         ##       ########      ##     
@@ -23,7 +24,11 @@ head(oocysts)
 
 
 ##OOCYSTS
-oocystsC<-c(oocysts$oocystsbites2control[oocysts$round=="day41"][1:24],
+oocystsC<-c(#oocysts$oocystsbites1control[oocysts$round=="day41"][1:24],
+            #oocysts$oocystsbites1control[oocysts$round=="day72"][1:24],
+            #oocysts$oocystsbites1control[oocysts$round=="day103"][1:24],
+            #oocysts$oocystsbites1control[oocysts$round=="day134"][1:24],
+            oocysts$oocystsbites2control[oocysts$round=="day41"][1:24],
            oocysts$oocystsbites2control[oocysts$round=="day72"][1:24],
            oocysts$oocystsbites2control[oocysts$round=="day103"][1:24],
            oocysts$oocystsbites2control[oocysts$round=="day134"][1:24],
@@ -40,6 +45,11 @@ oocystsC<-c(oocysts$oocystsbites2control[oocysts$round=="day41"][1:24],
            oocysts$oocystsbites5control[oocysts$round=="day103"][1:24],
            oocysts$oocystsbites5control[oocysts$round=="day134"][1:24])
 length(oocystsC)
+prevooc<-ifelse(oocystsC==0,0,1)
+prevooc1<-c(sum(sum(prevooc[1:24])/24,sum(prevooc[25:48])/24,sum(prevooc[49:72])/24,sum(prevooc[73:96])/24)/4,
+            sum(sum(prevooc[97:120])/24,sum(prevooc[121:144])/24,sum(prevooc[145:168])/24,sum(prevooc[169:192])/24)/4,
+            sum(sum(prevooc[193:216])/24,sum(prevooc[217:240])/24,sum(prevooc[241:264])/24,sum(prevooc[265:288])/24)/4,
+            sum(sum(prevooc[289:312])/24,sum(prevooc[313:336])/24,sum(prevooc[337:360])/24,sum(prevooc[360:384])/24)/4)
 
 freqoocC<-numeric(length(unique(oocystsC)))
 oocystsC2<-sort(unique(oocystsC))
@@ -50,7 +60,11 @@ for (j in 1:length(freqoocC)){
 probNooc[j]<-freqoocC[j]/sum(freqoocC)}
 freqdistoocC<-data.frame(oocystsC2,probNooc);colnames(freqdistoocC)[1]<-"Nooc"
 
-oocystsT<-c(oocysts$oocystsbites2atv[oocysts$round=="day41"][1:24],
+oocystsT<-c(#oocysts$oocystsbites1atv[oocysts$round=="day41"][1:24],
+            #oocysts$oocystsbites1atv[oocysts$round=="day72"][1:24],
+            #oocysts$oocystsbites1atv[oocysts$round=="day103"][1:24],
+            #oocysts$oocystsbites1atv[oocysts$round=="day134"][1:24],
+            oocysts$oocystsbites2atv[oocysts$round=="day41"][1:24],
             oocysts$oocystsbites2atv[oocysts$round=="day72"][1:24],
             oocysts$oocystsbites2atv[oocysts$round=="day103"][1:24],
             oocysts$oocystsbites2atv[oocysts$round=="day134"][1:24],
@@ -67,6 +81,13 @@ oocystsT<-c(oocysts$oocystsbites2atv[oocysts$round=="day41"][1:24],
             oocysts$oocystsbites5atv[oocysts$round=="day103"][1:24],
             oocysts$oocystsbites5atv[oocysts$round=="day134"][1:24])
 length(oocystsT)
+prevooc<-ifelse(oocystsT==0,0,1)
+prevoocT<-c(sum(sum(prevooc[1:24])/24,sum(prevooc[25:48])/24,sum(prevooc[49:72])/24,sum(prevooc[73:96])/24)/4,
+            sum(sum(prevooc[97:120])/24,sum(prevooc[121:144])/24,sum(prevooc[145:168])/24,sum(prevooc[169:192])/24)/4,
+            sum(sum(prevooc[193:216])/24,sum(prevooc[217:240])/24,sum(prevooc[241:264])/24,sum(prevooc[265:288])/24)/4,
+            sum(sum(prevooc[289:312])/24,sum(prevooc[313:336])/24,sum(prevooc[337:360])/24,sum(prevooc[360:384])/24)/4)
+EffOoc<-(prevooc1-prevoocT)/prevooc1
+
 freqoocT<-numeric(length(unique(oocystsT)))
 oocystsT2<-sort(unique(oocystsT))
 for (i in 1:length(oocystsT2)){ 
@@ -76,7 +97,11 @@ for (j in 1:length(freqoocT)){
   probNoocT[j]<-freqoocT[j]/sum(freqoocT)}
 freqdistoocT<-data.frame(oocystsT2,probNoocT);colnames(freqdistoocT)[1]<-"NoocT"
 
-meanoocysts<-c(mean(oocysts$oocystsbites2control[oocysts$round=="day41"],na.rm=TRUE),
+meanoocysts<-c(#mean(oocysts$oocystsbites1control[oocysts$round=="day41"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1control[oocysts$round=="day72"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1control[oocysts$round=="day103"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1control[oocysts$round=="day134"],na.rm=TRUE),
+               mean(oocysts$oocystsbites2control[oocysts$round=="day41"],na.rm=TRUE),
                mean(oocysts$oocystsbites2control[oocysts$round=="day72"],na.rm=TRUE),
                mean(oocysts$oocystsbites2control[oocysts$round=="day103"],na.rm=TRUE),
                mean(oocysts$oocystsbites2control[oocysts$round=="day134"],na.rm=TRUE),
@@ -92,6 +117,10 @@ meanoocysts<-c(mean(oocysts$oocystsbites2control[oocysts$round=="day41"],na.rm=T
                mean(oocysts$oocystsbites5control[oocysts$round=="day72"],na.rm=TRUE),
                mean(oocysts$oocystsbites5control[oocysts$round=="day103"],na.rm=TRUE),
                mean(oocysts$oocystsbites5control[oocysts$round=="day134"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1atv[oocysts$round=="day41"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1atv[oocysts$round=="day72"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1atv[oocysts$round=="day103"],na.rm=TRUE),
+               #mean(oocysts$oocystsbites1atv[oocysts$round=="day134"],na.rm=TRUE),
                mean(oocysts$oocystsbites2atv[oocysts$round=="day41"],na.rm=TRUE),
                mean(oocysts$oocystsbites2atv[oocysts$round=="day72"],na.rm=TRUE),
                mean(oocysts$oocystsbites2atv[oocysts$round=="day103"],na.rm=TRUE),
@@ -113,10 +142,55 @@ meanoocysts<-c(mean(oocysts$oocystsbites2control[oocysts$round=="day41"],na.rm=T
 spors<-read.csv("C:\\Users\\Ellie\\Documents\\Data Malaria\\Blagborough data Nat Comms\\sporozoites.csv",header=TRUE)
 spors$prevBS<-ifelse(spors$Parasitemia > 0 | spors$Gametocytemia > 0, 1, 0)
 head(spors)
+##MEAN PARASITEMIA IN MICE
+parasit<-cbind(
+spors$Parasitemia[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 1],
+spors$Parasitemia[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 2],
+spors$Parasitemia[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 3],
+spors$Parasitemia[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 4],
+spors$Parasitemia[spors$Bites==3 & spors$Treatment == 0 & spors$Round == 1],
+spors$Parasitemia[spors$Bites==3 & spors$Treatment == 0 & spors$Round == 2],
+spors$Parasitemia[spors$Bites==3 & spors$Treatment == 0 & spors$Round == 3],
+spors$Parasitemia[spors$Bites==3 & spors$Treatment == 0 & spors$Round == 4],
+spors$Parasitemia[spors$Bites==4 & spors$Treatment == 0 & spors$Round == 1],
+spors$Parasitemia[spors$Bites==4 & spors$Treatment == 0 & spors$Round == 2],
+spors$Parasitemia[spors$Bites==4 & spors$Treatment == 0 & spors$Round == 3],
+spors$Parasitemia[spors$Bites==4 & spors$Treatment == 0 & spors$Round == 4],
+spors$Parasitemia[spors$Bites==5 & spors$Treatment == 0 & spors$Round == 1],
+spors$Parasitemia[spors$Bites==5 & spors$Treatment == 0 & spors$Round == 2],
+spors$Parasitemia[spors$Bites==5 & spors$Treatment == 0 & spors$Round == 3],
+spors$Parasitemia[spors$Bites==5 & spors$Treatment == 0 & spors$Round == 4])
+parasitem<-numeric(16)
+for (i in 1:16){
+  parasitem[i]<-sum(parasit[,i])/5}
+
+parasitT<-cbind(
+  spors$Parasitemia[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 1],
+  spors$Parasitemia[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 2],
+  spors$Parasitemia[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 3],
+  spors$Parasitemia[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 4],
+  spors$Parasitemia[spors$Bites==3 & spors$Treatment == 1 & spors$Round == 1],
+  spors$Parasitemia[spors$Bites==3 & spors$Treatment == 1 & spors$Round == 2],
+  spors$Parasitemia[spors$Bites==3 & spors$Treatment == 1 & spors$Round == 3],
+  spors$Parasitemia[spors$Bites==3 & spors$Treatment == 1 & spors$Round == 4],
+  spors$Parasitemia[spors$Bites==4 & spors$Treatment == 1 & spors$Round == 1],
+  spors$Parasitemia[spors$Bites==4 & spors$Treatment == 1 & spors$Round == 2],
+  spors$Parasitemia[spors$Bites==4 & spors$Treatment == 1 & spors$Round == 3],
+  spors$Parasitemia[spors$Bites==4 & spors$Treatment == 1 & spors$Round == 4],
+  spors$Parasitemia[spors$Bites==5 & spors$Treatment == 1 & spors$Round == 1],
+  spors$Parasitemia[spors$Bites==5 & spors$Treatment == 1 & spors$Round == 2],
+  spors$Parasitemia[spors$Bites==5 & spors$Treatment == 1 & spors$Round == 3],
+  spors$Parasitemia[spors$Bites==5 & spors$Treatment == 1 & spors$Round == 4])
+parasitemT<-numeric(16)
+for (i in 1:16){
+  parasitemT[i]<-sum(parasitT[,i])/5}
 
 ##PREVALENCE IN MICE
 PREV_C<-cbind(
-
+#spors$prevBS[spors$Bites==1 & spors$Treatment == 0 & spors$Round == 1],
+#spors$prevBS[spors$Bites==1 & spors$Treatment == 0 & spors$Round == 2],
+#spors$prevBS[spors$Bites==1 & spors$Treatment == 0 & spors$Round == 3],
+#spors$prevBS[spors$Bites==1 & spors$Treatment == 0 & spors$Round == 4],
 spors$prevBS[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 1],
 spors$prevBS[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 2],
 spors$prevBS[spors$Bites==2 & spors$Treatment == 0 & spors$Round == 3],
@@ -135,7 +209,10 @@ spors$prevBS[spors$Bites==5 & spors$Treatment == 0 & spors$Round == 3],
 spors$prevBS[spors$Bites==5 & spors$Treatment == 0 & spors$Round == 4])
 
 PREV_T<-cbind(
-  
+#  spors$prevBS[spors$Bites==1 & spors$Treatment == 1 & spors$Round == 1],
+#  spors$prevBS[spors$Bites==1 & spors$Treatment == 1 & spors$Round == 2],
+#  spors$prevBS[spors$Bites==1 & spors$Treatment == 1 & spors$Round == 3],
+#  spors$prevBS[spors$Bites==1 & spors$Treatment == 1 & spors$Round == 4],
   spors$prevBS[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 1],
   spors$prevBS[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 2],
   spors$prevBS[spors$Bites==2 & spors$Treatment == 1 & spors$Round == 3],
@@ -154,6 +231,17 @@ PREV_T<-cbind(
   spors$prevBS[spors$Bites==5 & spors$Treatment == 1 & spors$Round == 4])
 
 ###sPOROZOITES
+sporsbites1<-subset(spors,Bites==1 & Treatment==0);sporsbites1
+newa1<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==1]);
+spb1r1<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+newb1<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==2]);
+spb1r2<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+newc1<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==3]);
+spb1r3<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+newd1<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==4]);
+spb1r4<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+
+
 sporsbites2<-subset(spors,Bites==2 & Treatment==0);sporsbites2
     a1<-sporsb2rd1<-c(sporsbites2$Sporozoite1[sporsbites2$Round==1],sporsbites2$Sporozoite2[sporsbites2$Round==1]);
     spb2r1<-c(length(sporsb2rd1[sporsb2rd1==0]),length(sporsb2rd1[sporsb2rd1==1]),length(sporsb2rd1[sporsb2rd1==2]),length(sporsb2rd1[sporsb2rd1==3]),length(sporsb2rd1[sporsb2rd1==4]))
@@ -195,11 +283,21 @@ sporsbites5<-subset(spors,Bites==5 & Treatment==0);sporsbites5
           qq1<-sporsb2rd1<-c(sporsbites5$Sporozoite1[sporsbites5$Round==4],sporsbites5$Sporozoite2[sporsbites5$Round==4],sporsbites5$Sporozoite3[sporsbites5$Round==4],sporsbites5$Sporozoite4[sporsbites5$Round==4],sporsbites5$Sporozoite5[sporsbites5$Round==4]);
           spb5r4<-c(length(sporsb2rd1[sporsb2rd1==0]),length(sporsb2rd1[sporsb2rd1==1]),length(sporsb2rd1[sporsb2rd1==2]),length(sporsb2rd1[sporsb2rd1==3]),length(sporsb2rd1[sporsb2rd1==4]))
 
-spors_C<-rbind(spb2r1,spb2r2,spb2r3,spb2r4,
+spors_C<-rbind(#spb1r1,spb1r2,spb1r3,spb1r4,
+               spb2r1,spb2r2,spb2r3,spb2r4,
                spb3r1,spb3r2,spb3r3,spb3r4,
                spb4r1,spb4r2,spb4r3,spb4r4,
                spb5r1,spb5r2,spb5r3,spb5r4)
 
+sporsbites1<-subset(spors,Bites==1 & Treatment==1);sporsbites1
+new_a<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==1]);
+spb1r1<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+new_b<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==2]);
+spb1r2<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+new_c<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==3]);
+spb1r3<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
+new_d<-sporsb1rd1<-c(sporsbites1$Sporozoite1[sporsbites1$Round==4]);
+spb1r4<-c(length(sporsb1rd1[sporsb1rd1==0]),length(sporsb1rd1[sporsb1rd1==1]),length(sporsb1rd1[sporsb1rd1==2]),length(sporsb1rd1[sporsb1rd1==3]),length(sporsb1rd1[sporsb1rd1==4]))
 
 
 sporsbites2<-subset(spors,Bites==2 & Treatment==1);sporsbites2
@@ -243,16 +341,31 @@ sporsbites5<-subset(spors,Bites==5 & Treatment==1);sporsbites5
           qq<-sporsb2rd1<-c(sporsbites5$Sporozoite1[sporsbites5$Round==4],sporsbites5$Sporozoite2[sporsbites5$Round==4],sporsbites5$Sporozoite3[sporsbites5$Round==4],sporsbites5$Sporozoite4[sporsbites5$Round==4],sporsbites5$Sporozoite5[sporsbites5$Round==4]);
           spb5r4<-c(length(sporsb2rd1[sporsb2rd1==0]),length(sporsb2rd1[sporsb2rd1==1]),length(sporsb2rd1[sporsb2rd1==2]),length(sporsb2rd1[sporsb2rd1==3]),length(sporsb2rd1[sporsb2rd1==4]))
   
-spors_T<-rbind(spb2r1,spb2r2,spb2r3,spb2r4,
+spors_T<-rbind(#spb1r1,spb1r2,spb1r3,spb1r4,
+               spb2r1,spb2r2,spb2r3,spb2r4,
                spb3r1,spb3r2,spb3r3,spb3r4,
                spb4r1,spb4r2,spb4r3,spb4r4,
                spb5r1,spb5r2,spb5r3,spb5r4)
+spors_Cprev<-spors_Tprev<-numeric(16)
+for(i in 1:16){
+spors_Cprev[i]<-1-(spors_C[i,1]/sum(spors_C[i,]))
+spors_Tprev[i]<-1-(spors_T[i,1]/sum(spors_T[i,]))
+}
 
-MEANsp<-c(mean(a1),mean(b1),mean(c1),mean(d1),
+effectSpors<-(spors_Cprev-spors_Tprev)/spors_Cprev
+EFFSPmbr<-c(sum(effectSpors[1:4])/4,
+            sum(effectSpors[5:8])/4,
+            sum(effectSpors[9:12])/4,
+            sum(effectSpors[13:16])/4)
+
+
+MEANsp<-c(#mean(newa1),mean(newb1),mean(newc1),mean(newd1),
+          mean(a1),mean(b1),mean(c1),mean(d1),
             mean(ee1),mean(ff1),mean(g1),mean(h1),
             mean(jj1),mean(kk1),mean(l1),mean(m1),
             mean(nn1),mean(oo1),mean(pp1),mean(qq1),
-            mean(a),mean(b),mean(c),mean(d),
+          #mean(new_a),mean(new_b),mean(new_c),mean(new_d),  
+          mean(a),mean(b),mean(c),mean(d),
             mean(ee),mean(ff),mean(g),mean(h),
             mean(jj),mean(kk),mean(l),mean(m),
             mean(nn),mean(oo),mean(pp),mean(qq))
@@ -264,6 +377,36 @@ prevcon<-prevtreat<-numeric(16)
     }
 
 prevs<-c(prevcon,prevtreat)
+prevmbrC<-c(sum(prevcon[1:4])/4,
+           sum(prevcon[5:8])/4,
+           sum(prevcon[9:12])/4,
+           sum(prevcon[13:16])/4)
+prevmbrT<-c(sum(prevtreat[1:4])/4,
+            sum(prevtreat[5:8])/4,
+            sum(prevtreat[9:12])/4,
+            sum(prevtreat[13:16])/4)
+meanprevpergroup<-(prevcon+prevtreat)/2
+######################################
+##
+###
+####  Data simple plots
+###
+###
+##
+######################################
+par(mfrow=c(2,2))
+parasitemia<-c(parasitem,parasitemT)
+plot(c(parasitem,parasitemT)~prevs,xlim=c(0,1),ylim=c(0,14))
+data2<-data.frame(parasitemia,prevs)
+
+vec2<-seq(0,1,by=0.2)
+boxplot(data2$parasitemia[data2$prevs==0],data2$parasitemia[data2$prevs==0.2],
+        data2$parasitemia[data2$prevs==0.4],data2$parasitemia[data2$prevs==0.6],
+        data2$parasitemia[data2$prevs==0.8],data2$parasitemia[data2$prevs==1],
+        col="blue",xaxt="n",xlab="Mean Prevalence",ylab="Parasitemia (%)")
+axis(1,at=seq(1,6,1),labels=vec2)
+
+
 
 ############################################################################
 ##
@@ -272,8 +415,8 @@ prevs<-c(prevcon,prevtreat)
 ##
 ##
 ############################################################################
-
-plot(MEANsp~meanoocysts)
+par(mfrow=c(2,1))
+plot(MEANsp~meanoocysts,xlab="Mean oocysts",ylab="Mean sporozoite scores")
 sat.binom<-function(p.vec){
   
   #a<-p.vec[1]
@@ -291,13 +434,16 @@ sat.binom<-function(p.vec){
   
   -sum(loglik,na.rm=T)
 }
-n.param<-3
-satmod<-optim(c(0.9,0.6,1,4),sat.binom,method="L-BFGS-B",lower=c(0,0.001,0.01,0.1),upper=c(10,10,10,5))
+n.param<-4
+satmod<-optim(c(0.9,0.2,0.6,4),sat.binom,method="L-BFGS-B",lower=c(0,0.2,0.5,4),upper=c(0.95,1,0.65,5))
 satmod
+satmod$par[1]<-0.9342045
+satmod$par[2]<-0.2166749
+satmod$par[3]<-0.5936314
+satmod$par[4]<-4.1838088
 nc<-seq(0,max(meanoocysts),1)
 pred<-(satmod$par[1] * nc^satmod$par[3])/(satmod$par[4] + satmod$par[2] * nc^satmod$par[3]) 
-lines(nc,pred,lwd=2,lty=2,col="red")
-
+lines(nc,pred,lwd=2,lty=3,col="red")
 #
 ## CIs for estimates from saturating function model
 #
@@ -338,7 +484,7 @@ q2d<-quantile(pds.new$d,0.975);q2d##
 predlower<-   (q1a * nc^q1c)/(q1d + q2b * nc^q1c) 
 predupper<-   (q2a * nc^q2c)/(q2d + q1b * nc^q2c)  
 
-par(mfrow=c(1,1));par(mar=c(5,5,5,5))
+par(mfrow=c(1,2));par(mar=c(5,5,5,5))
 plot(meanoocysts,MEANsp,
      ylim=c(0,3),ylab="Mean sporozoite score",
      xlim=c(0,max(meanoocysts)),xlab="Oocyst mean intensity",cex.lab=2)
@@ -360,7 +506,8 @@ datprev<-data.frame(prevs,meanoocysts,MEANsp)
 datprev$treat<-c(rep("Con",16),rep("Treat",16))
 datprev$prevs<-ifelse(datprev$meanoocysts==0,0,datprev$prevs)
 
-plot(c(0,prevs)~c(0,meanoocysts),ylim=c(0,1),xlim=c(0,max(meanoocysts)))
+par(mfrow=c(2,1));par(mar=c(5,5,2,2))
+plot(c(0,prevs)~c(0,meanoocysts),ylim=c(0,1),xlim=c(0,max(meanoocysts)),xlab="Mean oocysts",ylab="Prevalence Mice")
 log.binom<-function(p.vec){
   
   a<-p.vec[1]
@@ -381,7 +528,7 @@ lines(nc,pred2,lwd=2,lty=2,col="red")
 
 
 #fit individual Gompertz models to each TREATMENT group
-out.nls<-nlsList(prevs~SSgompertz(meanoocysts,a0,b0,b1)|treat, data=datprev)
+out.nls<-nlsList(datprev$prevs ~ SSgompertz(log(datprev$meanoocysts),a0,b0,b1|datprev$treat),data=datprev)
 ## SSgompertz(x,a0,b0,b1): y(f(x)) = a0 exp(-b0 b1^x)
 #Gompertz parameters for each group
 coef(out.nls)
@@ -422,12 +569,13 @@ gom.binom<-function(p.vec){
   -sum(loglik1,na.rm=T)
 }
 n.param<-3
-gommod<-optim(c(0.25, 0.24, 0.9),gom.binom,method="L-BFGS-B",lower=c(0.2,0.24,0.97),upper=c(0.24,0.8,1))
+gommod<-optim(c(0.25, 0.24, 0.9),gom.binom,method="L-BFGS-B",lower=c(0.10,0.15,0.6),upper=c(0.15,0.8,1))
 gommod
 
 nc<-seq(0,max(meanoocysts),1)
 pred2b<-(gommod$par[1]/gommod$par[2]) * exp (-exp(gommod$par[3] - gommod$par[2] * nc))
 lines(nc,pred2b,lwd=2,lty=3,col="blue")
+
 
 
 
@@ -480,239 +628,267 @@ data1<-list(N_C=16,
             )
 
 stan_rdump(ls(data1), "Ellie.data.R", envir=list2env(data1))
-fit1 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\mice.censored_sp.stan", data=data1,
+fit1 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\mice.censored_sp2.stan", data=data1,
              iter=1000, chains=2)
 print(fit1)
 
 params = extract(fit1)
 
 names(params)
-params$mu_s_C
 
 sampler_params<-get_sampler_params(fit1, inc_warmup=FALSE)
 sapply(sampler_params, function(x) c(x[, 'accept_stat__']))
 
 plot(as.mcmc(sapply(sampler_params, function(x) c(x[, 'accept_stat__']))[,2]))
 
-     #
-     ##
-######## estimate oocyst distribution with and without treatment
-     ##
-     #
-N <- 24
-pred_ooc_distC_mean <- exp(mean(params$log_mu_ooc_C)) / exp(mean(params$log_sigma_ooc_C))
-pred_ooc_distC_var <- (exp(mean(params$log_mu_ooc_C)) / exp(mean(params$log_sigma_ooc_C))^2) * (exp(mean(params$log_sigma_ooc_C)) + 1)
-pred_ooc_distC_k <- ((pred_ooc_distC_mean^2 - pred_ooc_distC_var) / N) / (pred_ooc_distC_var - pred_ooc_distC_mean)
+
+##Now take the average theta estimates for the controls and compare to the average theta for treatments
+##to give an overall efficacy estimate see Paddy's recent paper draft April 2015 (Sc - St / Sc)
+meanthetaCb2<-mean(params$theta_C[501:1000,1:4])
+meanthetaTb2<-mean(params$theta_T[501:1000,1:4])
+meanthetaCb3<-mean(params$theta_C[501:1000,5:8])
+meanthetaTb3<-mean(params$theta_T[501:1000,5:8])
+meanthetaCb4<-mean(params$theta_C[501:1000,9:12])
+meanthetaTb4<-mean(params$theta_T[501:1000,9:12])
+meanthetaCb5<-mean(params$theta_C[501:1000,13:16])
+meanthetaTb5<-mean(params$theta_T[501:1000,13:16])
+
+mbr<-c(2,3,4,5)
+meanEffect<-c((meanthetaCb2-meanthetaTb2)/meanthetaCb2,(meanthetaCb3-meanthetaTb3)/meanthetaCb3,(meanthetaCb4-meanthetaTb4)/meanthetaCb4,(meanthetaCb5-meanthetaTb5)/meanthetaCb5)
+
+vec<-seq(0.025,0.975,by=0.025)
+thetCb2<-thetCb3<-thetCb4<-thetCb5<-numeric(length(vec))
+thetTb2<-thetTb3<-thetTb4<-thetTb5<-numeric(length(vec))
+for (i in 1:length(vec)){
+  thetCb2[i]<-c(quantile(params$theta_C[501:1000,1:4],vec[i]))
+  thetCb3[i]<-c(quantile(params$theta_C[501:1000,5:8],vec[i]))
+  thetCb4[i]<-c(quantile(params$theta_C[501:1000,9:12],vec[i]))
+  thetCb5[i]<-c(quantile(params$theta_C[501:1000,13:16],vec[i]))
   
-PredictedOocystsC<-rnegbin(N,pred_ooc_distC_mean,pred_ooc_distC_k)
+  thetTb2[i]<-c(quantile(params$theta_T[501:1000,1:4],vec[i]))
+  thetTb3[i]<-c(quantile(params$theta_T[501:1000,5:8],vec[i]))
+  thetTb4[i]<-c(quantile(params$theta_T[501:1000,9:12],vec[i]))
+  thetTb5[i]<-c(quantile(params$theta_T[501:1000,13:16],vec[i]))
+  }
+maineffCupp95<-c(thetCb2[39],thetCb3[39],thetCb4[39],thetCb5[39])
+maineffTupp95<-c(thetTb2[39],thetTb3[39],thetTb4[39],thetTb5[39])
 
-pred_ooc_distT_mean <- exp(mean(params$log_mu_ooc_T)) / exp(mean(params$log_sigma_ooc_T))
-pred_ooc_distT_var <- (exp(mean(params$log_mu_ooc_T)) / exp(mean(params$log_sigma_ooc_T))^2) * (exp(mean(params$log_sigma_ooc_T)) + 1)
-pred_ooc_distT_k <- ((pred_ooc_distT_mean^2 - pred_ooc_distT_var) / N) / (pred_ooc_distT_var - pred_ooc_distT_mean)
+maineffCLOW95<-c(thetCb2[1],thetCb3[1],thetCb4[1],thetCb5[1])
+maineffTLOW95<-c(thetTb2[1],thetTb3[1],thetTb4[1],thetTb5[1])
 
-PredictedOocystsT<-rnegbin(N,pred_ooc_distT_mean,pred_ooc_distT_k)
-
-     #
-     ##
-######## estimate sporozoite distribution with and without treatment
-     ##
-     #
-N <- 25
-PredictedSpsC<-rnegbin(N,mean(params$sim_ooc_count_C),mean(var(params$sim_ooc_count_C)))
-PredictedSpsT<-rnegbin(N,mean(params$sim_ooc_count_T),mean(var(params$sim_ooc_count_T)))
-
-     #
-     ##
-######## estimate PREVALENCE IN MICE with and without treatment
-     ##
-     #
-mu_s_C <- exp(  params$beta_mu[1] * mean(params$log_mu_ooc_C)
-                + params$beta_mu[2] * mean(params$log_sigma_ooc_C)
-                + mean(params$alpha_mu))
-sigma_s_C <- exp(  params$beta_sigma[1] * mean(params$log_mu_ooc_C)
-                   + params$beta_sigma[2] * mean(params$log_sigma_ooc_C)
-                   + mean(params$alpha_sigma))
-theta_C <- inv.logit(  params$beta_theta[1] * log(mu_s_C)
-                          + params$beta_theta[2] * log(sigma_s_C)
-                          + mean(params$alpha_theta))
-
-PredPrev_C <- c(dbinom(0, size=50, prob=theta_C))
-                
-
-mu_s_T <- exp(  params$beta_mu[1] * mean(params$log_mu_ooc_T)
-                   + params$beta_mu[2] * mean(params$log_sigma_ooc_T)
-                   + mean(params$alpha_mu))
-sigma_s_T <- exp(  params$beta_sigma[1] * mean(params$log_mu_ooc_T)
-                      + params$beta_sigma[2] * mean(params$log_sigma_ooc_T)
-                      + mean(params$alpha_sigma))
-theta_T <- inv.logit(  params$beta_theta[1] * log(mu_s_T)
-                       + params$beta_theta[2] * log(sigma_s_T)
-                       + mean(params$alpha_theta))
-
-PredPrev_T <- c(dbinom(0, size=50, prob=theta_T))
-
-##So the difference in the probability of infection is 
-
-PredPrev_C - PredPrev_T  ## 0.2447927 
-
-par(mfrow=c(2,2))
-hist(PredictedOocystsC,xlab="Oocysts from Controls")
-hist(PredictedOocystsT,xlab="Oocysts from TREATMENT")
-
-hist(PredictedSpsC,xlab="Sporozoites from Controls")
-hist(PredictedSpsT,xlab="Sporozoites from TREATMENT")
-
-##With ATV-25 we can reduce the probability of infection by 24.5% 
-
-#################
-#################
-##Model 2
-##Removing the control and treatment comparison
-data2<-list(N_Comb=32,
-            N_ooc=24,
-            N_mice=5,
-            ooc_count = structure(.Data = c(oocystsC,oocystsT),
-                                    .Dim=c(24,32)),
-            prev = structure(.Data =c(PREV_C,PREV_T),.Dim=c(5,32)),
-            N_bin=5,
-            bin_edge=c(0,1,10,100,1000,1002),
-            s_count = structure(.Data=rbind(spors_C,spors_T),.Dim=c(32,5)))
-stan_rdump(ls(data2), "Ellie.data2.R", envir=list2env(data2))
+EFFu<-(maineffCupp95-maineffTupp95)/maineffCupp95
+EFFl<-(maineffCLOW95-maineffTLOW95)/maineffCLOW95
 
 
-##And considering solely the control data
-data2control<-list(N_Comb=16,
-            N_ooc=24,
-            N_mice=5,
-            ooc_count = structure(.Data = c(oocystsC),
-                                  .Dim=c(24,16)),
-            prev = structure(.Data =c(PREV_C),.Dim=c(5,16)),
-            N_bin=5,
-            bin_edge=c(0,1,10,100,1000,1002),
-            s_count = structure(.Data=rbind(spors_C),.Dim=c(16,5)))
+CB2<-sum(rbern(16,prob=meanthetaCb2))/length(rbern(16,prob=meanthetaCb2))
+CB3<-sum(rbern(16,prob=meanthetaCb3))/length(rbern(16,prob=meanthetaCb3))
+CB4<-sum(rbern(16,prob=meanthetaCb4))/length(rbern(16,prob=meanthetaCb4))
+CB5<-sum(rbern(16,prob=meanthetaCb5))/length(rbern(16,prob=meanthetaCb5))
+maineffectC<-c(CB2,CB3,CB4,CB5)
 
-sum(s_count[,1]);sum(s_count[,2]);sum(s_count[,3]);sum(s_count[,4]);sum(s_count[,5])
+TB2<-sum(rbern(16,prob=meanthetaTb2))/length(rbern(16,prob=meanthetaTb2))
+TB3<-sum(rbern(16,prob=meanthetaTb3))/length(rbern(16,prob=meanthetaTb3))
+TB4<-sum(rbern(16,prob=meanthetaTb4))/length(rbern(16,prob=meanthetaTb4))
+TB5<-sum(rbern(16,prob=meanthetaTb5))/length(rbern(16,prob=meanthetaTb5))
+maineffectT<-c(TB2,TB3,TB4,TB5);sum(maineffectC,maineffectT)/8##this is probability of infection from mosquito to mouse
 
-data2atvs<-list(N_Comb=16,
-                   N_ooc=24,
-                   N_mice=5,
-                   ooc_count = structure(.Data = c(oocystsT),
-                                         .Dim=c(24,16)),
-                   prev = structure(.Data =c(PREV_T),.Dim=c(5,16)),
-                   N_bin=5,
-                   bin_edge=c(0,1,10,100,1000,1002),
-                   s_count = structure(.Data=rbind(spors_T),.Dim=c(16,5)))
-
-fit2C <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=data2controls,
-             iter=100, chains=4)
-print(fit2C);params = extract(fit2);names(params)
-
-fit2T <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=data2controls,
-              iter=100, chains=4)
-print(fit2T);paramsT = extract(fit2T);names(paramsT)
-
-##cALCULATE THE RESPECTIVE PREDICTED POPULATIONS OF OOCYSTS AND SPOROZOITES AND PREVALENCE IN MICE
-
-Nsp_mu<-(exp(params$beta_mu[1] * params$logmu_ooc + params$beta_mu[2] * params$logmu_ooc + params$alpha_mu))
-Nsp_sigma<-(exp(params$beta_sigma[1] * params$logsigma_ooc + params$beta_sigma[2] * params$logsigma_ooc + params$alpha_mu))
-
-sampmeanSPmu<-exp(params$beta_mu[1] * params$logmu_ooc + params$beta_mu[2] * params$logsigma_ooc + params$alpha_mu)
-sampmeanSPsigma<-exp(params$beta_sigma[1] * params$logsigma_ooc + params$beta_sigma[2] * params$logsigma_ooc + params$alpha_sigma)
-sampvarSP<-sampmeanSPmu+(sampmeanSPmu^2/sampmeanSPsigma)
-N=200
-predNs_k<-(sampmeanSPmu^2-(sampvarSP/N))/(sampvarSP-sampmeanSPmu)
-
-NSP<-rnegbin(N,sampmeanSPmu,predNs_k)
-sort(NSP)
-length(NSP[NSP==0])
-length(NSP[NSP>0 & NSP < 11])
-length(NSP[NSP>10 & NSP < 101])
-length(NSP[NSP==100 & NSP <1001])
-length(NSP[NSP>1000])
-
-
-###################################################################
+#############################
 ##
-## tRYING EACH GROUP independently
+###
+#### Plot effect size per mosquito biting rate (95%CI)
+###
 ##
+###############################
+
+plot(maineffectC*100~mbr,ylab="Effect Size % (95% CI)",
+     ylim=c(-40,100),
+     xlab="Mosquito biting rate",
+     main="Impact of treatment on Infection",
+     xlim=c(1,5),pch="",cex.lab=1.2)
+
+for (i in 1:4){
+  segments(mbr[i], EFFu[i]*100, x1 = mbr[i], y1 = EFFl[i]*100,
+           col  = terrain.colors(10), lty = 1, lwd = 5)
+}
+points(meanEffect*100~mbr,col="black",pch=20)
+lines(meanEffect*100~mbr,col="black",pch=20)
+text(3.5,100,"Overall Effect Size = 13.0%")
+text(3.5,90,"A positive value indicates drug treatment")
+text(3.5,82,"benefits the hosts in comparison to control")
+abline(h=0,lty=2,col="lightgrey")
+text(2.5,-30,"Probability of infection mosquito to mouse = 59.4%")
+
+##and the overall effect size
+meanthetaC<-mean(params$theta_C[501:1000,1:16])
+meanthetaT<-mean(params$theta_T[501:1000,1:16])
+(meanthetaC-meanthetaT)/meanthetaC
+##EffOoc
+##EFFSPmbr
+lines(EffOoc*100~mbr,pch=20,col="grey25",lty=2)
+lines(EFFSPmbr*100~mbr,pch=20,col="grey15",lty=3)
+
+legend(1,20,legend=c("Model estimate (95% CI)","Oocysts","Sporozoites"),
+       lty=c(1,2,3),col=c("forestgreen","grey25","grey15"),lwd=c(3,1,1))
+
+######################################################
+######################################################
+thetasC<-thetasT<-thetasupT<-thetasupC<-thetasloT<-thetasloC<-numeric(16)
+for (i in 1:16){
+  thetasC[i]<-mean(params$theta_C[501:1000,i])
+  thetasT[i]<-mean(params$theta_T[501:1000,i])
+  thetasupC[i]<-quantile(params$theta_C[501:1000,i],0.975)
+  thetasupT[i]<-quantile(params$theta_T[501:1000,i],0.975)
+  thetasloC[i]<-quantile(params$theta_C[501:1000,i],0.025)
+  thetasloT[i]<-quantile(params$theta_T[501:1000,i],0.025)
+}
+
+effectsp<-(thetasC-thetasT)/thetasC
+effectspL<-(thetasupC-thetasupT)/thetasupC
+effectspU<-(thetasloC-thetasloT)/thetasloC
+meanprevpergroup<-(prevcon+prevtreat)/2
+###########################
 ##
-###################################
+###
+#### Effect size vs parasitemia of the treatment group / Overall
+###
+##
+#############################
+parasitemia<-(parasitem+parasitemT)/2
+plot(effectsp~parasitemia,xlim=c(0,12),ylim=c(-0.5,1),
+     xlab="Parasitemia (%)",ylab="Effect Size TBI")
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * parasitemia)) / (1 + exp(a + b * parasitemia)) ) 
+  prev1<-effectsp
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,12,0.01)
+pred2<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) )
+lines(nc,pred2,lwd=2,lty=2,col="red")
 
-########################################
-##gp A (bite2 round1 Treatment = control)
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * parasitemia)) / (1 + exp(a + b * parasitemia)) ) 
+  prev1<-effectspU
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,12,0.01)
+pred2u<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) )
+lines(nc,pred2u,lwd=2,lty=2,col="red")
 
-d1<-list(N_Comb=1,
-         N_ooc=32,
-         N_mice=5,
-         ooc_count = structure(.Data = c(oocysts$oocystsbites2control[oocysts$round=="day41"][1:32]),
-                                     .Dim=c(32,1)),
-         prev = structure(.Data =c(PREV_C[,1]),.Dim=c(5,1)),
-         N_bin=5,
-         bin_edge=c(0,1,10,100,1000,1002),
-         s_count = structure(.Data=rbind(spors_C[1,]),.Dim=c(1,5)))
-f1 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=d1,
-             iter=1000, chains=4)
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * parasitemia)) / (1 + exp(a + b * parasitemia)) ) 
+  prev1<-effectspL
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,12,0.01)
+pred2L<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) )
+lines(nc,pred2L,lwd=2,lty=2,col="red")
+polygon(c(nc, rev(nc)),c(pred2u,rev(pred2L)),border=NA, col="aquamarine1")
+lines(nc,pred2,lwd=2,lty=2,col="red")
+points(effectsp~parasitemia,col="blue",pch=20)
 
-print(f1);params = extract(f1)
-names(params)
-meangpA<-mean(params$mu_s)/mean(params$sigma_s)
-vargpA<-(mean(params$mu_s)/(mean(params$sigma_s))^2) * (mean(params$sigma_s) + 1)
-N = 10
-kgpA = (meangpA^2-(vargpA/N))/(vargpA-meangpA)
-meangpA;vargpA
-
-Nsp_gpA<-rnegbin(N,meangpA,kgpA)
-sort(Nsp_gpA)
-length(Nsp_gpA[Nsp_gpA==0])
-length(Nsp_gpA[Nsp_gpA>0 & Nsp_gpA < 11])
-length(Nsp_gpA[Nsp_gpA>10 & Nsp_gpA < 101])
-length(Nsp_gpA[Nsp_gpA==100 & Nsp_gpA <1001])
-length(Nsp_gpA[Nsp_gpA>1000])
-
+##################################
+##
+###
+##### Plot Effect size vs host prevalence
+###
 #######################
-## And gp B (bite2 round2 Treatment = control)
+plot(c(1,effectsp)~c(0,meanprevpergroup),
+     xlim=c(0,1),xlab="Host prevalence",
+     ylim=c(-0.5,1),ylab="Effect size TBI")
 
-d2<-list(N_Comb=1,
-         N_ooc=45,
-         N_mice=5,
-         ooc_count = structure(.Data = c(oocysts$oocystsbites2control[oocysts$round=="day72"][1:45]),
-                               .Dim=c(45,1)),
-         prev = structure(.Data =c(PREV_C[,2]),.Dim=c(5,1)),
-         N_bin=5,
-         bin_edge=c(0,1,10,100,1000,1002),
-         s_count = structure(.Data=rbind(spors_C[2,]),.Dim=c(1,5)))
-f2 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=d2,
-           iter=1000, chains=4)
+##summary(glm(effectsp~parasitemT))
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * c(0,meanprevpergroup))) / (1 + exp(a + b * c(0,meanprevpergroup))) ) 
+  prev1<-c(1,effectsp)
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,1,0.01)
+pred2<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) ) 
+lines(nc,pred2,lwd=2,lty=2,col="red")
+
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * c(0,meanprevpergroup))) / (1 + exp(a + b * c(0,meanprevpergroup))) ) 
+  prev1<-c(1,effectspL)
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,1,0.01)
+pred2u<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) ) 
+lines(nc,pred2u,lwd=2,lty=2,col="red")
+
+log.binom<-function(p.vec){
+  
+  a<-p.vec[1]
+  b<-p.vec[2]
+  
+  pred1a<- ((exp(a + b * c(0,meanprevpergroup))) / (1 + exp(a + b * c(0,meanprevpergroup))) ) 
+  prev1<-c(1,effectspU)
+  
+  loglik1a<- prev1* log((pred1a)+0.00001)+(1-prev1)*log(1-((pred1a)-0.00001))
+  -sum(loglik1a,  na.rm=T)
+}
+n.param<-2
+logmod<-optim(c(0,0),log.binom,method="L-BFGS-B",lower=c(-10,-10),upper=c(10,10))
+logmod
+nc<-seq(0,1,0.01)
+pred2l<-((exp(logmod$par[1] + logmod$par[2] * nc)) / (1 + exp(logmod$par[1] + logmod$par[2] * nc)) ) 
+lines(nc,pred2l,lwd=2,lty=2,col="red")
+polygon(c(nc, rev(nc)),c(pred2u,rev(pred2l)),border=NA, col="aquamarine1")
+lines(nc,pred2,lwd=2,lty=2,col="red")
+points(c(1,effectsp)~c(0,meanprevpergroup),col="blue",pch=20)
 
 
-print(f2);params = extract(f2)
-names(params)
-meansp<-mean(params$mu_s)/mean(params$sigma_s)
-varsp<-(mean(params$mu_s)/(mean(params$sigma_s))^2) * (mean(params$sigma_s) + 1)
-meansp;varsp
-#######################
-## And gp XXX (bite XX round XX Treatment = XXXXX)
 
-d8<-list(N_Comb=1,
-         N_ooc=45,
-         N_mice=5,
-         ooc_count = structure(.Data = c(oocysts$oocystsbites3control[oocysts$round=="day134"]),
-                               .Dim=c(45,1)),
-         prev = structure(.Data =c(PREV_C[,8]),.Dim=c(5,1)),
-         N_bin=5,
-         bin_edge=c(0,1,10,100,1000,10000),
-         s_count = structure(.Data=rbind(spors_C[8,]),.Dim=c(1,5)))
-f8 <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODEL2stan.stan", data=d8,
-           iter=1000, chains=4)
 
-print(f8);params = extract(f8)
-names(params)
-meansp<-mean(params$mu_s)/mean(params$sigma_s)
-varsp<-(mean(params$mu_s)/(mean(params$sigma_s))^2) * (mean(params$sigma_s) + 1)
-meansp;varsp
+
 
 meansporsdist<-c(25.04,0.66,16.80,15.24,20.98,85.70,16.21,19.77,33.36,26.91,7.02,19.28,18.37,29.67,31.31,36.44)
 meansporsdist<-c(15.48783,3.774894,18.89685,11.44132,29.17819,2.514613,54.84545,7.54126)
+
 
 
 ##calculate the lowest mean for each popualtion given the break down of sporozoites
@@ -747,82 +923,6 @@ for (i in 1:4){
   d5T[,i]<-c(rep(0,spors_T[i+12,1]),rep(1,spors_T[i+12,2]),rep(11,spors_T[i+12,3]),rep(101,spors_T[i+12,4]),rep(1001,spors_T[i+12,5]))
 }
 lowestmeanT<-c(total[1:4]/10,total[5:8]/15,total[9:12]/20,total[13:16]/25)
-
-datamodb<-list(N_C=4,
-               N_T=4,
-               N_ooc=24,
-               N_sp=25,
-               N_mice=5,
-               ooc_count_C = structure(.Data = c(oocystsC[289:384]),
-                                       .Dim=c(24,4)),
-               ooc_count_T = structure(.Data = c(oocystsT[289:384]),
-                                       .Dim=c(24,4)),
-               prev_C = structure(.Data =PREV_C[,13:16],.Dim=c(5,4)),
-               prev_T = structure(.Data =PREV_T[,13:16],.Dim=c(5,4)),
-               s_count_C = structure(.Data=cbind(d5[,1],d5[,2],d5[,3],d5[,4]),.Dim=c(25,4)),
-               s_count_T = structure(.Data=cbind(d5T[,1],d5T[,2],d5T[,3],d5T[,4]),.Dim=c(25,4))
-)
-
-datamodb4<-list(N_C=4,
-               N_T=4,
-               N_ooc=24,
-               N_sp=20,
-               N_mice=5,
-               ooc_count_C = structure(.Data = c(oocystsC[193:288]),
-                                       .Dim=c(24,4)),
-               ooc_count_T = structure(.Data = c(oocystsT[193:288]),
-                                       .Dim=c(24,4)),
-               prev_C = structure(.Data =PREV_C[,9:12],.Dim=c(5,4)),
-               prev_T = structure(.Data =PREV_T[,9:12],.Dim=c(5,4)),
-               s_count_C = structure(.Data=cbind(d4[,1],d4[,2],d4[,3],d4[,4]),.Dim=c(20,4)),
-               s_count_T = structure(.Data=cbind(d4T[,1],d4T[,2],d4T[,3],d4T[,4]),.Dim=c(20,4))
-)
-
-datamodb3<-list(N_C=4,
-                N_T=4,
-                N_ooc=24,
-                N_sp=15,
-                N_mice=5,
-                ooc_count_C = structure(.Data = c(oocystsC[97:192]),
-                                        .Dim=c(24,4)),
-                ooc_count_T = structure(.Data = c(oocystsT[97:192]),
-                                        .Dim=c(24,4)),
-                prev_C = structure(.Data =PREV_C[,5:8],.Dim=c(5,4)),
-                prev_T = structure(.Data =PREV_T[,5:8],.Dim=c(5,4)),
-                s_count_C = structure(.Data=cbind(d3[,1],d3[,2],d3[,3],d3[,4]),.Dim=c(15,4)),
-                s_count_T = structure(.Data=cbind(d3T[,1],d3T[,2],d3T[,3],d3T[,4]),.Dim=c(15,4))
-)
-
-datamodb2<-list(N_C=4,
-                N_T=4,
-                N_ooc=24,
-                N_sp=10,
-                N_mice=5,
-                ooc_count_C = structure(.Data = c(oocystsC[1:96]),
-                                        .Dim=c(24,4)),
-                ooc_count_T = structure(.Data = c(oocystsT[1:96]),
-                                        .Dim=c(24,4)),
-                prev_C = structure(.Data =PREV_C[,1:4],.Dim=c(5,4)),
-                prev_T = structure(.Data =PREV_T[,1:4],.Dim=c(5,4)),
-                s_count_C = structure(.Data=cbind(d2[,1],d2[,2],d2[,3],d2[,4]),.Dim=c(10,4)),
-                s_count_T = structure(.Data=cbind(d2T[,1],d2T[,2],d2T[,3],d2T[,4]),.Dim=c(10,4))
-)
-fit1test <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODELb.stan", data=datamodb,
-                  iter=100, chains=4)
-print(fit1test)
-
-fitB4test <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODELb.stan", data=datamodb4,
-                 iter=100, chains=4)
-print(fitB4test)
-
-fitB3test <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODELb.stan", data=datamodb3,
-                  iter=100, chains=4)
-print(fitB3test)
-
-fitB2test <- stan(file="C:\\Users\\Ellie\\Documents\\RStudioProjects\\Malaria\\TBD and RTSS Model\\MODELb.stan", data=datamodb2,
-                  iter=100, chains=4)
-print(fitB2test)
-
 
 
 DATA1<-c(lowestmeanC,lowestmeanT)      ##Minimum that the mean can be for each of the populations given distribution of sporozoites
@@ -913,62 +1013,6 @@ pred3<-(satmod$par[1] * nc)/(1 + satmod$par[2] * nc)
 lines(nc,pred3,lwd=2,lty=2,col="red")
 
 
-
-
-#########################################################
-##########################################################
-r = 0.5
-m = 5.3
-k = 10
-
-nb1<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4) * (k - r - 5) * (k - r - 6) * (k - r - 7) * (k - r - 8) * (k - r - 9) * (k - r - 10))/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb2<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4) * (k - r - 5) * (k - r - 6) * (k - r - 7) * (k - r - 8) * (k - r - 9) )/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb3<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4) * (k - r - 5) * (k - r - 6) * (k - r - 7) * (k - r - 8) )/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb4<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4) * (k - r - 5) * (k - r - 6) * (k - r - 7) )/(factorial(k))) *
-  (m/(r+m))^k
-
-nb5<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4) * (k - r - 5) * (k - r - 6)  )/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb6<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4) * (k - r - 5) )/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb7<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) * (k - r - 4)  )/(factorial(k))) *
-  (m/(r+m))^k
-
-nb8<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2) * (k - r - 3) )/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb9<-((r/(r+m))^r) *
-  (((k - r - 1) * (k - r - 2)  )/(factorial(k))) *
-  (m/(r+m))^k
-
-
-nb91<-((r/(r+m))^r) *
-  (((k - r - 1)  )/(factorial(k))) *
-  (m/(r+m))^k
-nb1;nb2;nb3;nb4;nb5;nb6;nb7;nb8;nb9;nb91
-nb1+nb2+nb3+nb4+nb5+nb6+nb7+nb8+nb9+nb91
 
 ######################################################################################
 ##

@@ -151,14 +151,10 @@ model {
   for (g in 1:N_C) {
     log_mu_ooc_C[g] <-   rho__log_mean_ooc_C
                        + tau_bite__log_mean_ooc_C
-                         * rho_bite__log_mean_ooc_C[(g - 1) / N_round + 1]
-                       + tau_round__log_mean_ooc_C
-                         * rho_round__log_mean_ooc_C[(g - 1) % N_round + 1];
+                         * rho_bite__log_mean_ooc_C[g];
     log_phi_ooc_C[g] <-  rho__log_od_ooc_C
                        + tau_bite__log_od_ooc_C
-                         * rho_bite__log_od_ooc_C[(g - 1) / N_round + 1]
-                       + tau_round__log_od_ooc_C
-                         * rho_round__log_od_ooc_C[(g - 1) % N_round + 1];
+                         * rho_bite__log_od_ooc_C[g];
   }
   
   for(n in 1:N_ooc)
@@ -168,14 +164,10 @@ model {
   for (g in 1:N_T) {
     log_mu_ooc_T[g] <-   rho__log_mean_ooc_T
                        + tau_bite__log_mean_ooc_T
-                         * rho_bite__log_mean_ooc_T[(g - 1) / N_round + 1]
-                       + tau_round__log_mean_ooc_T
-                         * rho_round__log_mean_ooc_T[(g - 1) % N_round + 1];
+                         * rho_bite__log_mean_ooc_T[g];
     log_phi_ooc_T[g] <-  rho__log_od_ooc_T
                        + tau_bite__log_od_ooc_T
-                         * rho_bite__log_od_ooc_T[(g - 1) / N_round + 1]
-                       + tau_round__log_od_ooc_T
-                         * rho_round__log_od_ooc_T[(g - 1) % N_round + 1];
+                         * rho_bite__log_od_ooc_T[g];
   }
   
   for(n in 1:N_ooc)
